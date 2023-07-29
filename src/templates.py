@@ -36,16 +36,19 @@ Steps:
 7. Use consistent formatting, markdown headers, code blocks
 8. Ensure a clear intro/overview and conclusion/summary
 
-Remember, you should output the page in markdown format.
+Remember, you should output the page in markdown format. Don't write any text that isn't related to the page.
 
+CONTEXT: 
 {context}
 
 -----
 
+REFERENCE PAGE:
 {reference_page}
 
 -----
 
+You were given a context and a reference page to improve on. Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
 Start.
 """
 
@@ -102,10 +105,10 @@ Here are some criteria you should consider when reviewing and critiquing the doc
 7. Grammar and Language Use: Are there grammatical errors or awkward phrasing that makes the documentation hard to understand? Are technical terms explained or linked to further reading?
 
 Draft documentation:
-{draft_documentation}
+{improved_page}
 
 Official Langchain documentation:
-{official_documentation} 
+{reference_page} 
 
 Now, provide the top 3 areas for improvement. Ensure your feedback is clear and actionable:
 1. 
