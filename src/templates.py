@@ -32,20 +32,6 @@ Remember, you should output the page in markdown format.
 Start.
 """
 
-CRITIQUE_PAGE_TEMPLATE = """
-
-
-{context}
-
------
-
-{reference_page}
-
------
-
-{improved_page}
-"""
-
 FEEDBACK_IMPROVE_PAGE_TEMPLATE = """
 
 
@@ -62,4 +48,31 @@ FEEDBACK_IMPROVE_PAGE_TEMPLATE = """
 -----
 
 {critique}
+"""
+
+CRITIQUE_PAGE_TEMPLATE = """"
+You are an expert in Langchain, a framework for developing applications powered by large language models. 
+
+Goal: I will provide you with draft documentation on the topic of {topic}. Please review the draft documentation and official Langchain documentation below, then provide constructive feedback on how 
+the draft documentation can be improved. Focus on providing the top 3 areas for improvement. Ensure your feedback is clear and actionable.
+
+Here are some criteria you should consider when reviewing and critiquing the documentation:
+1. Completeness: Is the documentation covering all necessary aspects of using Langchain for Question Answering? Are there missing sections that need to be filled in? For example, installation, getting started, tutorials, API references, examples, etc.
+2. Clarity: Is the information provided clear and easy to understand? Does the language used make the content accessible to both novice and experienced users?
+3. Technical Accuracy: Are the provided instructions, examples, and other technical details accurate? Are there discrepancies between the draft documentation and the official Langchain documentation?
+4. Consistency: Is the style and tone of the documentation consistent with the official Langchain documentation? Consistency in language and presentation helps to maintain a unified user experience.
+5. Organization and Structure: Is the information presented in a logical and structured manner? Does the flow of content make sense? Is there a table of contents or other navigation aids?
+6. Relevance and Usefulness of Examples: Are the examples relevant and do they clearly demonstrate the concept or feature they are meant to explain? Do the examples cover a range of simple to complex scenarios?
+7. Grammar and Language Use: Are there grammatical errors or awkward phrasing that makes the documentation hard to understand? Are technical terms explained or linked to further reading?
+
+Draft documentation:
+{draft_documentation}
+
+Official Langchain documentation:
+{official_documentation} 
+
+Now, provide the top 3 areas for improvement. Ensure your feedback is clear and actionable:
+1. 
+2. 
+3.
 """
