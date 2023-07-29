@@ -32,7 +32,7 @@ Context
 --------
 
 Official documentation:
-{improved_page}
+{reference_page}
 
 Now, provide the top 3 areas for improvement. Ensure your feedback is clear and actionable:
 1. 
