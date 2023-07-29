@@ -1,4 +1,3 @@
-
 IMPROVE_PAGE_TEMPLATE = """
 Goal: You are an expert AI agent developer who is tasked with writng comprehensive guides for your library, LangChain. 
 You are given a context and a reference page to improve on. You are tasked to create a new markdown page that improves on the reference page by:
@@ -32,24 +31,7 @@ Remember, you should output the page in markdown format.
 Start.
 """
 
-FEEDBACK_IMPROVE_PAGE_TEMPLATE = """
-
-
-{context}
-
------
-
-{reference_page}
-
------
-
-{improved_page}
-
------
-
-{critique}
-"""
-
+# TOOD: Context and examples 
 CRITIQUE_PAGE_TEMPLATE = """"
 You are an expert in Langchain, a framework for developing applications powered by large language models. 
 
@@ -57,8 +39,8 @@ Goal: I will provide you with draft documentation on the topic of {topic}. Pleas
 the draft documentation can be improved. Focus on providing the top 3 areas for improvement. Ensure your feedback is clear and actionable.
 
 Here are some criteria you should consider when reviewing and critiquing the documentation:
-1. Completeness: Is the documentation covering all necessary aspects of using Langchain for Question Answering? Are there missing sections that need to be filled in? For example, installation, getting started, tutorials, API references, examples, etc.
-2. Clarity: Is the information provided clear and easy to understand? Does the language used make the content accessible to both novice and experienced users?
+1. Completeness: Is the documentation covering all necessary aspects of {topic}? Are there missing sections that need to be filled in?
+2. Clarity: Is the information provided clear and easy to understand? Does the language used make the content accessible to both novice and experienced developers?
 3. Technical Accuracy: Are the provided instructions, examples, and other technical details accurate? Are there discrepancies between the draft documentation and the official Langchain documentation?
 4. Consistency: Is the style and tone of the documentation consistent with the official Langchain documentation? Consistency in language and presentation helps to maintain a unified user experience.
 5. Organization and Structure: Is the information presented in a logical and structured manner? Does the flow of content make sense? Is there a table of contents or other navigation aids?
@@ -75,4 +57,22 @@ Now, provide the top 3 areas for improvement. Ensure your feedback is clear and 
 1. 
 2. 
 3.
+"""
+
+FEEDBACK_IMPROVE_PAGE_TEMPLATE = """
+
+
+{context}
+
+-----
+
+{reference_page}
+
+-----
+
+{improved_page}
+
+-----
+
+{critique}
 """
