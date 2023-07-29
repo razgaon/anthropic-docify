@@ -9,10 +9,6 @@ Instructions basics:
 - Provide the specific input to process
 
 
-
-
-
-
 """
 
 
@@ -116,20 +112,24 @@ Now, provide the top 3 areas for improvement. Ensure your feedback is clear and 
 CRITIQUE_PAGE_TEMPLATE_V2 = """"
 You are an expert in Langchain, a framework for developing applications powered by large language models. 
 
-Below is some official Langchain documentation:
+Below is some context:
 
-<official_documentation>
-{official_documentation}
-</official_documentation> 
-
-Below is the draft documentation:
-
-<draft_documentation>
-{draft_documentation}
-</draft_documentation>
+<context>
+{context}
+</context> 
 
 
-Goal: You are provided with some official Langchain documentation specified in <official_documentation> and draft documentation specified in <draft_documentation> about the topic from the reference page. Please review the draft documentation and official Langchain documentation, then provide constructive feedback on how the draft documentation can be improved. 
+Below is the reference documentation:
+
+<reference_documentation>
+{reference_documentation}
+</reference_documentation>
+
+<improved_page>
+{improved_page}
+</improved_page>
+
+Goal: You are provided with some <context> and official documentation specified in <reference_documentation> and an improved version of official documentation specified in <improved_page>. Please review <improved_page> and provide constructive feedback on how the <improved_page> can be improved. 
 Focus on providing the top 3 areas for improvement. Ensure your feedback is clear and actionable.
 
 Here are some criteria you should consider when reviewing and critiquing the documentation:
@@ -204,19 +204,41 @@ If no variable is used without imported or defined, just tell me that there are 
 
 
 FEEDBACK_IMPROVE_PAGE_TEMPLATE = """
+Goal: You are an expert AI agent developer who is tasked with writng comprehensive guides for your library, LangChain. 
 
-
+Below is some context:
+<context>
 {context}
+</context>
 
------
-
+Below is the official Langchain documentation:
+<reference_page>
 {reference_page}
+</reference_page>
 
------
-
+Below is the draft documentation that is supposed to improve the official Langchain documentation:
+<improved_page>
 {improved_page}
+</improved_page>
 
------
-
+Below is the critique about the <improved_page> specified in <critique>:
+<critique>
 {critique}
+</critique>
+
+You are given 
+1. Some context specified in <context>
+2. A reference page specified in <reference_page> to improve on
+3. A improved version of <reference_page> specified in <improved_page>.
+4. Critique about the <improved_page> specified in <critique>
+
+You are tasked to create a new documentation in markdown format based on <improved_page> and feedback from <critique>.
+
+Steps:
+1. Carefully read through the <context>, <reference_page>, and <improved_page>
+2. Read through the <critique> about the <improved_page>
+3. Based on the <critique> about the <improved_page>, write a markdown page that improves on the <improved_page> by taking feedback from
+
+
+Begin:
 """
