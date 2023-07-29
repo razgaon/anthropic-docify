@@ -12,8 +12,6 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-
-
 def main():
     df = pd.read_csv('./data/data.csv')
     
