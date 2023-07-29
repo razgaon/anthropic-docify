@@ -30,7 +30,7 @@ def main():
     
     improved = get_improved_page(reference_doc, context)
     
-    with(open('./data/improved.html', 'w')) as f:
+    with(open('./data/improved.md', 'w')) as f:
         f.write(improved)
 
 
