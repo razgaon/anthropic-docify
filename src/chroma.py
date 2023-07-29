@@ -1,9 +1,10 @@
 import logging
-import os, sys
+import sys
 from typing import List
 import chromadb
 import dataclasses
-from llama_index import Document, VectorStoreIndex, StorageContext
+from llama_index import Document
+from utils import get_all_paths
 from llama_index.vector_stores import ChromaVectorStore
 from custom_types import Source, SourceType
 from crawler import WebpageCrawler, SourceType
@@ -46,22 +47,6 @@ def add_collection(name: str, sources: List[Source]):
 
 
 def create_langchain_collection():
-    def get_all_paths(directory):
-        paths = []
-        for root, dirs, files in os.walk(directory):
-            for file in files:
-                if file.endswith(".mdx"):
-                    paths.append(
-                        "https://python.langchain.com/docs"
-                        + (
-                            os.path.join(root, file)
-                            .replace(directory, "")
-                            .replace(".mdx", "")
-                            .replace("index", "")
-                        )
-                    )
-        return paths
-
     directory = "/Users/allengu/langchain/docs/docs_skeleton/docs"  # replace with your directory path
     langchain_paths = get_all_paths(directory)
     errored = []
