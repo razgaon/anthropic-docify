@@ -1,3 +1,21 @@
+"""
+Human v.s. Assistant
+
+Instructions basics:
+- Describe a task, its rules and any exceptions.
+- Give example inputs & outputs
+- Provide more context
+- Demand specific output formatting
+- Provide the specific input to process
+
+
+
+
+
+
+"""
+
+
 IMPROVE_PAGE_TEMPLATE = """
 Goal: You are an expert AI agent developer who is tasked with writng comprehensive guides for your library, LangChain. 
 You are given a context and a reference page to improve on. You are tasked to create a new markdown page that improves on the reference page by:
@@ -58,6 +76,59 @@ Now, provide the top 3 areas for improvement. Ensure your feedback is clear and 
 2. 
 3.
 """
+
+
+CHECK_MISSING_SYMBOLS_TEMPLATE = """
+You are an experienced software engineer. Help review the draft documentation and check if there are any symbols being used that is not imported or defined in the code sample.
+
+Following is the first example:
+
+<example>
+For the following code snippet:
+```python
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory
+
+conversation = ConversationChain(
+    llm=chat,
+    memory=ConversationBufferMemory()
+)
+
+conversation.run("Answer briefly. What are the first 3 colors of a rainbow?")
+```
+
+The ConversationChain is initialized with llm=chat, but chat is not defined or imported anywhere in the code. So this would throw an error unless chat was defined and initialized somewhere else in the full code.
+</example>
+
+Following is the second example:
+<example>
+For the following code snippet:
+```python
+llm = OpenAI(temperature=0)
+from langchain.prompts.prompt import PromptTemplate
+from langchain.chains import ConversationChain
+
+template = "some template .... {history} {input}"
+prompt = PromptTemplate(input_variables=["history", "input"], template=template)
+conversation_with_kg = ConversationChain(
+    llm=llm, verbose=True, prompt=prompt, memory=ConversationKGMemory(llm=llm)
+)
+```
+
+The symbol `OpenAI` is used without being imported or defined anywhere in the code. So this would throw an error.
+</example>
+
+Here is the draft documentation for you to review:
+
+<draft_documentation>
+{draft_documentation}
+</draft_documentation>
+
+Now, review the draft documentation and check if there are any symbol being used that is not imported or defined in the code sample. 
+For each symbol being used that is not imported or defined, find exact quote from the draft documentation and explain why it is not imported or defined.
+If no variable is used without imported or defined, just tell me that there are no variables used without being imported or defined.
+"""
+
 
 FEEDBACK_IMPROVE_PAGE_TEMPLATE = """
 
