@@ -14,8 +14,10 @@ from unstructured.cleaners.core import clean, clean_extra_whitespace
 logger = logging.getLogger(__name__)
 
 class SourceType(str, Enum):
+    Youtube = "Youtube"
     Blog = "Blog"
     Website = "Website"
+    Official = "Official"
 
 
 @dataclass
@@ -35,8 +37,9 @@ class Crawler(ABC):
 
 
 class WebpageCrawler(Crawler):
-    def __init__(self, use_unstructured = True) -> None:
+    def __init__(self, source_type: SourceType, use_unstructured = True) -> None:
         super().__init__()
+        self.source_type = source_type
         self.use_unstructured = use_unstructured
     
     def _get_webpage_body(self, url: str) -> Tag:
@@ -62,14 +65,14 @@ class WebpageCrawler(Crawler):
         if self.use_unstructured:
             res = Source(
                 url=url,
-                source_type=SourceType.Website,
+                source_type=self.source_type,
                 authors=[],
                 content=self._get_unstructured_document(url)
             )
         else:                
             res = Source(
                 url=url,
-                source_type=SourceType.Website,
+                source_type=self.source_type,
                 authors=[],
                 content=self._html_to_markdown(self._get_webpage_body(url))
             )
