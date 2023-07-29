@@ -27,7 +27,7 @@ Here are some criteria you should consider when reviewing and critiquing the doc
 7. Grammar and Language Use: Are there grammatical errors or awkward phrasing that makes the documentation hard to understand? Are technical terms explained or linked to further reading?
 
 Context
-{reference_page} 
+{context} 
 
 --------
 
