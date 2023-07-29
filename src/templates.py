@@ -78,20 +78,22 @@ Steps:
 7. Use consistent formatting, markdown headers, code blocks
 8. Ensure a clear intro/overview and conclusion/summary
 
+
+You are given a context and a reference page to improve on. Add examples, details, and explanations from the context and the reference page to create the best guide possible.
 Remember, you should output the page in markdown format.
 
-Beign:
+Begin:
 """
 
 # TOOD: Context and examples 
 CRITIQUE_PAGE_TEMPLATE = """"
 You are an expert in Langchain, a framework for developing applications powered by large language models. 
 
-Goal: I will provide you with draft documentation on the topic of {topic}. Please review the draft documentation and official Langchain documentation below, then provide constructive feedback on how 
+Goal: I will provide you with draft documentation on the topic from the reference page. Please review the draft documentation and official Langchain documentation below, then provide constructive feedback on how 
 the draft documentation can be improved. Focus on providing the top 3 areas for improvement. Ensure your feedback is clear and actionable.
 
 Here are some criteria you should consider when reviewing and critiquing the documentation:
-1. Completeness: Is the documentation covering all necessary aspects of {topic}? Are there missing sections that need to be filled in?
+1. Completeness: Is the documentation covering all necessary aspects from the reference page? Are there missing sections that need to be filled in?
 2. Clarity: Is the information provided clear and easy to understand? Does the language used make the content accessible to both novice and experienced developers?
 3. Technical Accuracy: Are the provided instructions, examples, and other technical details accurate? Are there discrepancies between the draft documentation and the official Langchain documentation?
 4. Consistency: Is the style and tone of the documentation consistent with the official Langchain documentation? Consistency in language and presentation helps to maintain a unified user experience.
@@ -127,11 +129,11 @@ Below is the draft documentation:
 </draft_documentation>
 
 
-Goal: You are provided with some official Langchain documentation specified in <official_documentation> and draft documentation specified in <draft_documentation> about {topic}. Please review the draft documentation and official Langchain documentation, then provide constructive feedback on how the draft documentation can be improved. 
+Goal: You are provided with some official Langchain documentation specified in <official_documentation> and draft documentation specified in <draft_documentation> about the topic from the reference page. Please review the draft documentation and official Langchain documentation, then provide constructive feedback on how the draft documentation can be improved. 
 Focus on providing the top 3 areas for improvement. Ensure your feedback is clear and actionable.
 
 Here are some criteria you should consider when reviewing and critiquing the documentation:
-1. Completeness: Is the documentation covering all necessary aspects of {topic}? Are there missing sections that need to be filled in?
+1. Completeness: Is the documentation covering all necessary aspects of the reference page? Are there missing sections that need to be filled in?
 2. Clarity: Is the information provided clear and easy to understand? Does the language used make the content accessible to both novice and experienced developers?
 3. Technical Accuracy: Are the provided instructions, examples, and other technical details accurate? Are there discrepancies between the draft documentation and the official Langchain documentation?
 4. Consistency: Is the style and tone of the documentation consistent with the official Langchain documentation? Consistency in language and presentation helps to maintain a unified user experience.

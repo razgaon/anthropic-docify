@@ -19,7 +19,7 @@ def main():
     
     chroma_collection = chroma_client.get_collection(name="official")
     
-    x = chroma_collection.query(query_texts=["What is a langchain retriever?"], n_results=3)
+    x = chroma_collection.query(query_texts=["What is a langchain retriever?"], n_results=8)
     url = 'https://python.langchain.com/docs/modules/chains/how_to/memory'
     
     context_list = x.get("documents")[0]
