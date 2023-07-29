@@ -2,7 +2,7 @@ import logging
 import chromadb
 import pandas as pd
 from agent import get_improved_page
-from utils import LANGCHAIN_BASE
+from utils import LANGCHAIN_BASE, save_output
 chroma_client = chromadb.PersistentClient()
 
 
@@ -35,12 +35,8 @@ def main():
     
     improved = get_improved_page(reference_doc, context, reference_page_name)
     
-    with(open(f'./output/v0/{reference_page_name}.md', 'w')) as f:
-        f.write(reference_doc)
-        
-    with(open(f'./output/final/{reference_page_name}.md', 'w')) as f:
-        f.write(improved)
-
+    save_output(f'./output/v0/{reference_page_name}.md', reference_doc)
+    save_output(f'./output/final/{reference_page_name}.md', improved)
 
 if __name__ == "__main__":
     main()
