@@ -2,7 +2,7 @@ import logging
 import chromadb
 import pandas as pd
 from agent import get_improved_page
-
+from utils import LANGCHAIN_BASE
 chroma_client = chromadb.PersistentClient()
 
 
@@ -25,12 +25,16 @@ def main():
     context_list = x.get("documents")[0]
     context = '\n\n'.join(context_list)
     
-    reference_doc = df[df['url'] == url]['content']
+    reference_df = df[df['url'] == url]
+    
+    reference_doc = reference_df['content']
+    reference_page_name = reference_df['url'].split(LANGCHAIN_BASE)[1]
     
     
-    improved = get_improved_page(reference_doc, context)
     
-    with(open('./data/improved.md', 'w')) as f:
+    improved = get_improved_page(reference_doc, context, reference_page_name)
+    
+    with(open(f'./output/final/{reference_page_name}.md', 'w')) as f:
         f.write(improved)
 
 
