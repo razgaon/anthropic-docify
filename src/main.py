@@ -12,22 +12,26 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+
+
 def main():
     df = pd.read_csv('./data/data.csv')
     
     chroma_collection = chroma_client.get_collection(name="official")
-    
-    x = chroma_collection.query(query_texts=["What is a langchain retriever?"], n_results=8)
     url = 'https://python.langchain.com/docs/modules/chains/how_to/memory'
     
-    context_list = x.get("documents")[0]
-    context = '\n\n'.join(context_list)
-    
     reference_df = df[df['url'] == url]
+    
+    # x = chroma_collection.get(where={"url": url})
     
     reference_doc = reference_df['content'].iloc[0] 
     reference_page_name = reference_df['url'].iloc[0].split(LANGCHAIN_BASE + "/")[1] # will return something like /modules/chains/how_to/memory.md'
     reference_page_name = reference_page_name.replace("/", '-') # Prevents issue with writing the file
+    
+    x = chroma_collection.query(query_texts=[reference_doc], n_results=8)
+    
+    context_list = x.get("documents")[0]
+    context = '\n\n'.join(context_list)
     
     improved = get_improved_page(reference_doc, context, reference_page_name)
     
