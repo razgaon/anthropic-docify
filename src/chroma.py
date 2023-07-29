@@ -5,7 +5,6 @@ import chromadb
 import dataclasses
 from llama_index import Document
 from utils import get_all_paths
-from llama_index.vector_stores import ChromaVectorStore
 from custom_types import Source, SourceType
 from crawler import WebpageCrawler, SourceType
 from tqdm import tqdm
@@ -63,14 +62,6 @@ def create_langchain_collection():
         except Exception as e:
             errored.append(url)
             print(f"Error on {url}, {e}")
-
-    # TO CSV HERE
-    # df = pd.DataFrame(rows)
-    # df.to_csv("./data/data.csv", index=False)
-
-    # # Keep track of urls that errored
-    # with open("./data/errored.pickle", "wb") as file:
-    #     pickle.dump(errored, file)
 
     collection = add_collection("official", sources)
     return collection
