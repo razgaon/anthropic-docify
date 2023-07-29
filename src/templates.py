@@ -43,7 +43,9 @@ Now, provide the top 3 areas for improvement. Ensure your feedback is clear and 
 
 IMPROVE_PAGE_TEMPLATE = """
 Goal: You are an expert AI agent developer who is tasked with writng comprehensive guides for your library, LangChain. 
-You are given a context and a reference page to improve on. You are tasked to create a new markdown page that improves on the reference page by:
+
+You are given context, a reference page, and critique. You need to rewrite the reference page. You are tasked to create a new markdown page that improves on the reference page by achieving the following targets:
+Targets:
 1. Adding context and relevant information from the provided context. For example, if you reference a topic, bring examples and explanations from the context to the reference page.
 2. Providing more detailed explanations of concepts. For example, if the reference page provides a high-level overview of a concept, provide more details and clarity.
 3. Adding code examples where applicable. For example, if the reference page provides a code snippet, add more code examples to illustrate the concept.
@@ -61,7 +63,7 @@ Steps:
 7. Use consistent formatting, markdown headers, code blocks
 8. Ensure a clear intro/overview and conclusion/summary
 
-Remember, you should output the page in markdown format. Don't write any text that isn't related to the page.
+Remember, you should output the page in markdown format.
 
 CONTEXT: 
 {context}
@@ -73,7 +75,12 @@ REFERENCE PAGE:
 
 -----
 
-You were given a context and a reference page to improve on. Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
+CRITIQUE: 
+{critique}
+
+
+Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
+Be very detailed and write at least 500 words unless there is nothing to write about.
 Start.
 """
 
