@@ -27,13 +27,15 @@ def main():
     
     reference_df = df[df['url'] == url]
     
-    reference_doc = reference_df['content']
-    reference_page_name = reference_df['url'].split(LANGCHAIN_BASE)[1]
-    
-    
+    reference_doc = reference_df['content'].iloc[0] 
+    reference_page_name = reference_df['url'].iloc[0].split(LANGCHAIN_BASE + "/")[1] # will return something like /modules/chains/how_to/memory.md'
+    reference_page_name = reference_page_name.replace("/", '-') # Prevents issue with writing the file
     
     improved = get_improved_page(reference_doc, context, reference_page_name)
     
+    with(open(f'./output/v0/{reference_page_name}.md', 'w')) as f:
+        f.write(reference_doc)
+        
     with(open(f'./output/final/{reference_page_name}.md', 'w')) as f:
         f.write(improved)
 
