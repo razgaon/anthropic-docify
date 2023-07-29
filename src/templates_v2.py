@@ -64,6 +64,7 @@ Below is the official Langchain documentation:
 </reference_documentation>
 
 Below is the draft documentation that is supposed to improve the official Langchain documentation:
+
 <improved_page>
 {improved_page}
 </improved_page>

@@ -26,6 +26,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
     with(open(f'./output/v2/{reference_page_name}.md', 'w')) as f:
         f.write(critique)
 
+    final_page = critique
     # Step 3: Given an improved page and critique, generate a new improved page
     print(f'Generating improved page for {reference_page_name}')
     feedback_improve_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(FEEDBACK_IMPROVE_PAGE_TEMPLATE))
