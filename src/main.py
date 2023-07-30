@@ -43,6 +43,7 @@ def main():
     urls = get_all_paths(directory)
 
     for url in tqdm(urls[:1]):
+        # Trigger deployment
         try:
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
