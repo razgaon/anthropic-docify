@@ -31,14 +31,20 @@ def main():
     urls = get_all_paths(directory)    
     chroma_collection = chroma_client.get_collection(name="official")
     
-    for url in tqdm(urls[:1]):
-        
-        reference_df = df[df['url'] == url]
-        reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
-        
-        output = get_improved_page(reference_doc, context, reference_page_name)
-        
-        save_output(f'./docs/{reference_page_name.replace("-", "/")}.md', output)
+    for url in tqdm(urls[40:50]):
+        try:
+            reference_df = df[df['url'] == url]
+            reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
+            
+            # output = get_improved_page(reference_doc, context, reference_page_name)
+            
+            name_to_save = reference_page_name.replace("-", "/")
+            if name_to_save.endswith('/'):
+                name_to_save += 'index'
+            print(name_to_save)
+            # save_output(f'./docs/{name_to_save}.md', output)
+        except:
+            pass
 
 if __name__ == "__main__":
     main()
