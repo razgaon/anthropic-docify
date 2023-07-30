@@ -5,14 +5,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from templates import FEEDBACK_IMPROVE_PAGE_TEMPLATE, CRITIQUE_PAGE_TEMPLATE, IMPROVE_PAGE_TEMPLATE, INITIAL_CRITIQUE_PAGE_TEMPLATE
-chat = ChatAnthropic(model='claude-2')
+from templates import CRITIQUE_PAGE_TEMPLATE, IMPROVE_PAGE_TEMPLATE, INITIAL_CRITIQUE_PAGE_TEMPLATE
+chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=2048)
 
 def get_improved_page(reference_page: str, context: str, reference_page_name: str) -> str:
     # Step 1: Give initial critique
     print(f'Generating initial critique for {reference_page_name}')
     critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(INITIAL_CRITIQUE_PAGE_TEMPLATE))
     initial_critique = critique_page_chain.run(context=context, reference_page=reference_page)
+    
     with(open(f'./output/v1/{reference_page_name}.md', 'w')) as f:
         f.write(initial_critique)
         
@@ -28,6 +29,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
     print(f'Generating critique for {reference_page_name}')
     critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE))
     critique = critique_page_chain.run(context=context, reference_page=reference_page, improved_page=improved_page)
+    
     with(open(f'./output/v3/{reference_page_name}.md', 'w')) as f:
         f.write(critique)
 
