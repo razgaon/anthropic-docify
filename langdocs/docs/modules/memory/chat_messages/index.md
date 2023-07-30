@@ -1,88 +1,111 @@
 
 
-# RetrievalQA Chain
+# Chat Messages
 
-## Introduction
+## Overview
 
-The RetrievalQA chain combines a document retriever with a question answering model to enable querying over a large collection of documents. As mentioned in the reference, some key benefits of using RetrievalQA include:
-
-- Answering questions by searching over thousands or millions of documents
-- Providing relevant context and citations for answers  
-- Scaling to large document collections
-
-For example, as shown in the context, if our documents have a "source" metadata key, we can use the `RetrievalQAWithSourceChain` to cite our sources:
-
-```python
-from langchain.chains import RetrievalQAWithSourcesChain
-from langchain import OpenAI
-  
-chain = RetrievalQAWithSourcesChain.from_chain_type(OpenAI(temperature=0), chain_type="stuff", retriever=docsearch.as_retriever())
-
-chain({"question": "What did the president say about Justice Breyer"}, return_only_outputs=True)
-
-{'answer': ' The president honored Justice Breyer for his service and mentioned his legacy of excellence.\n',
- 'sources': '31-pl'}
-```
+The `ChatMessageHistory` class provides a lightweight way to store a history of chat messages between a human and an AI agent. It can be useful both when managing memory directly or when integrated into an LLMChain or ChatModelChain. 
 
 ## Usage
 
-The usage section remains the same as in the original reference, showing how to index documents and construct the RetrievalQA chain.
-
-## Chain Types
-
-This section explains how to load different chain types, with examples both using the `from_chain_type` method as well as loading chains directly.
-
-## Custom Prompts
-
-As mentioned in the context, you can also use custom prompts with RetrievalQA. For example, to respond in Italian:
+To use `ChatMessageHistory`:
 
 ```python
-prompt_template = """
-{context}
-Domanda: {question}
-Risposta:
-"""
+from langchain.memory import ChatMessageHistory
 
-prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"]) 
+history = ChatMessageHistory()
 
-qa = RetrievalQA.from_chain_type(
-  llm=OpenAI(),
-  chain_type="stuff",
-  retriever=docsearch.as_retriever(),
-  chain_type_kwargs={"prompt": prompt}
-)
+history.add_user_message("Hi there!") 
+history.add_ai_message("Hello! Nice to meet you.")
 ```
 
-## Returning Source Documents  
+The `add_user_message` and `add_ai_message` methods allow you to append new messages to the history. 
 
-As shown in the context, we can also return source documents:
+You can then access the full message history:
 
 ```python
-qa = RetrievalQA.from_chain_type(
-  llm=OpenAI(),
-  chain_type="stuff",
-  retriever=docsearch.as_retriever(),
-  return_source_documents=True
-)
+history.messages
 ```
 
-## Performance Considerations
+Which would return:
 
-Some key performance considerations:
+```
+[
+  HumanMessage(content='Hi there!'),
+  AIMessage(content='Hello! Nice to meet you.')  
+]
+```
 
-- Retrieval time scales linearly with index size. Larger indexes will be slower.
-- Can optimize latency by using approximate nearest neighbor algorithms.
-- There is a tradeoff between accuracy and speed - simpler chain types like `stuff` are faster but less accurate.
+## Advanced Usage
 
-## Comparison to Alternatives
+The `ChatMessageHistory` supports some more advanced usage:
 
-RetrievalQA provides a balance between end-to-end QA models like GPT-3 which can be slow and expensive, vs dense retrieval which requires training data. Key differences:
+- **Metadata**: You can pass additional metadata like `username` when adding messages:
 
-- RetrievalQA leverages pretrained LM capabilities without fine-tuning.
-- Lower latency than end-to-end QA since it retrieves and summarizes. 
-- No training data required compared to dense retrieval.
+  ```python
+  history.add_user_message("Hi there!", username="john")
+  ```
 
-## Conclusion
+- **Custom message types**: You can subclass `ChatMessage` to create custom message types:
 
-In summary, RetrievalQA is a fast and flexible way to add QA to documents at scale, with customizable retrieval and answering.
+  ```python
+  class SystemMessage(ChatMessage):
+      pass
+
+  history.add_message(SystemMessage("Loading..."))
+  ```
+
+- **Serialization**: `ChatMessageHistory` can be serialized to JSON for persistence:
+
+  ```python
+  json_string = history.to_json()
+  new_history = ChatMessageHistory.from_json(json_string)
+  ```
+
+## Using in Chains
+
+`ChatMessageHistory` can be used in chains by passing it to the `memory` parameter:
+
+```python
+from langchain.chains import LLMChain
+
+memory = ChatMessageHistory()
+chain = LLMChain(..., memory=memory)
+```
+
+The chain will automatically read/write messages to the history.
+
+One of the core utility classes underpinning most (if not all) memory modules is the ChatMessageHistory class. This is a super lightweight wrapper which exposes convenience methods for saving Human messages, AI messages, and then fetching them all.
+
+You may want to use this class directly if you are managing memory outside of a chain.
+
+Let's take a look at using this in a chain. We'll use an LLMChain, and show working with both an LLM and a ChatModel.
+
+#### Using an LLM
+
+Notice that 'chat_history' is present in the prompt template. Notice that we need to align the memory_key.
+
+#### Using a ChatModel
+
+Notice that we return_messages=True to fit into the MessagesPlaceholder. Notice that "chat_history" aligns with the MessagesPlaceholder name.
+
+### Next Steps
+
+Please see the other sections for walkthroughs of more advanced topics, like custom memory, multiple memories, and more.
+
+## Memory Concepts
+
+When using memory in a chain, there are a few key concepts to understand. Note that here we cover general concepts that are useful for most types of memory. Each individual memory type may very well have its own parameters and concepts that are necessary to understand.
+
+### What variables get returned from memory
+
+Before going into the chain, various variables are read from memory. This have specific names which need to align with the variables the chain expects. You can see what these variables are by calling `memory.load_memory_variables({})`. Note that the empty dictionary that we pass in is just a placeholder for real variables. If the memory type you are using is dependent upon the input variables, you may need to pass some in.
+
+### Whether memory is a string or a list of messages
+
+One of the most common types of memory involves returning a list of chat messages. These can either be returned as a single string, all concatenated together (useful when they will be passed in LLMs) or a list of ChatMessages (useful when passed into ChatModels). By default, they are returned as a single string. In order to return as a list of messages, you can set `return_messages=True`
+
+### What keys are saved to memory
+
+Often times chains take in or return multiple input/output keys. In these cases, how can we know which keys we want to save to the chat message history? This is generally controllable by `input_key` and `output_key` parameters on the memory types. These default to None - and if there is only one input/output key it is known to just use that. However, if there are multiple input/output keys then you MUST specify the name of which one to use.
 
