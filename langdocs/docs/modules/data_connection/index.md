@@ -1,5 +1,3 @@
-
-
 # Connecting External Data to Language Models
 
 Many language model applications require connecting user-specific data that is not part of the model's training set. The data connection module in LangChain provides the building blocks to load, transform, store and query external data, enabling it to be used alongside language models.
@@ -11,10 +9,10 @@ The main components of the data connection module are:
 - **Document Loaders**: Load documents from diverse sources like local files, databases, APIs, etc.
 - **Document Transformers**: Preprocess documents by splitting, converting to QA pairs, removing duplicates etc.
 - **Text Embedding Models**: Convert text to vector representations capturing semantic meaning.
-- **Vector Stores**: Index and store document vectors for efficient similarity search.  
+- **Vector Stores**: Index and store document vectors for efficient similarity search.
 - **Retrievers**: Query vector stores to find relevant documents.
 
-![Data Connection Pipeline](data_connection.png)
+### Data Connection Pipeline
 
 These components allow building pipelines to bring in external data, process it, index it for fast retrieval, and query it from language models.
 
@@ -23,7 +21,7 @@ These components allow building pipelines to bring in external data, process it,
 Document loaders allow loading data from various sources:
 
 - Local files and folders
-- Databases via SQLAlchemy 
+- Databases via SQLAlchemy
 - APIs via Requests
 - Google Drive, S3 Buckets
 
@@ -33,10 +31,10 @@ Custom loaders can be written for other data sources.
 
 ```python
 # Load local text file
-loader = DocumentLoader() 
+loader = DocumentLoader()
 docs = loader.load_from_path('data.txt')
 
-# Load SQL database 
+# Load SQL database
 loader = PSQLDocumentLoader(table='documents', db_url='...')
 docs = loader.load()
 ```
@@ -51,14 +49,14 @@ Transformers preprocess loaded documents before indexing. Useful transformations
 
 Multiple transformers can be chained for complex pipelines.
 
-**Examples:** 
+**Examples:**
 
 ```python
 # Split documents
 splitter = SplitDocuments(chunk_size=100)
 docs = splitter.transform(docs)
 
-# Convert to QA 
+# Convert to QA
 to_qa = Doc2QA()
 docs = to_qa.transform(docs)
 ```
@@ -67,12 +65,12 @@ docs = to_qa.transform(docs)
 
 Embedders convert text to vector representations capturing semantic meaning, allowing vector similarity based retrieval.
 
-LangChain supports models like SBERT, GPT-2 etc. Custom embeddings can also be provided. 
+LangChain supports models like SBERT, GPT-2 etc. Custom embeddings can also be provided.
 
 **Example:**
 
 ```python
-embedder = SBERTEmbedding() 
+embedder = SBERTEmbedding()
 embeddings = embedder.embed_documents(docs)
 ```
 
@@ -80,14 +78,14 @@ embeddings = embedder.embed_documents(docs)
 
 Vector stores like FAISS and Pinecone index embeddings for fast similarity search. Stores can persist data to disk.
 
-**Example:** 
+**Example:**
 
 ```python
 store = FAISS()
-store.add_documents(embeddings) 
+store.add_documents(embeddings)
 ```
 
-## Retrievers 
+## Retrievers
 
 Retrievers query vector stores to find relevant documents using text or embeddings. Different retrievers optimize for latency, accuracy etc.
 
@@ -95,8 +93,7 @@ Retrievers query vector stores to find relevant documents using text or embeddin
 
 ```python
 retriever = EmbeddingRetriever(vectorstore=store)
-results = retriever.retrieve("What is LangChain?") 
+results = retriever.retrieve("What is LangChain?")
 ```
 
 The data connection module provides the building blocks to connect external data to language models. The modular design allows customizing pipelines for specific use cases.
-
