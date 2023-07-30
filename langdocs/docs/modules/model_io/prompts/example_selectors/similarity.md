@@ -1,55 +1,126 @@
 
-# Selecting Examples
 
-The `ExampleSelector` classes in LangChain allow dynamically selecting a subset of examples to include in the prompt based on the input. This is useful when you have a large pool of examples but need to only include a small number in each prompt.
+Select by similarity
+====================
 
-## Semantic Similarity Selector
+The SemanticSimilarityExampleSelector selects examples based on their similarity to the input text. It uses cosine similarity between sentence embeddings to find the most relevant examples.
 
-The `SemanticSimilarityExampleSelector` selects examples based on their semantic similarity to the input, calculated using embeddings.
+### How it works
 
-This is useful for tasks where examples similar to the input are likely to be the most relevant, like question answering. The selector finds the most semantically related examples to prime the model towards the correct output.
+Under the hood, the SemanticSimilarityExampleSelector does the following:
 
-For example:
+1. Generates embeddings for each example using a sentence embedding model like OpenAIEmbeddings. 
+
+2. Stores these embeddings in a vector store like Chroma to enable fast nearest neighbor search.
+
+3. When given an input, generates its embedding using the same sentence embedding model. 
+
+4. Finds the most similar example embeddings in the vector store using cosine similarity.
+
+5. Returns the examples corresponding to the most similar embeddings.
+
+### Performance considerations
+
+Using SemanticSimilarityExampleSelector can be slow for large example sets, since it needs to embed every example. Some options to improve performance:
+
+- Reduce the number of examples if possible
+- Use a faster embedding model like SBERT
+- Increase k so fewer examples need to be compared per query
+
+### Choosing k
+
+The k parameter controls how many similar examples to return. Lower k improves performance, higher k potentially improves accuracy. Some guidelines:
+
+- Start with k=1 or k=2 for baseline performance
+- Increase k if model accuracy is poor and more examples may help
+- Decrease k if query latency is too high and fewer examples are needed
+
+### Adding new examples
+
+When adding new examples via `add_example()`, be sure to call `embed_examples()` afterwards to generate embeddings needed for similarity search.
+
+### Usage
+
+#### Import required classes
 
 ```python
-selector = SemanticSimilarityExampleSelector(
-  examples, OpenAIEmbeddings(), Chroma, k=2  
+from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
+from langchain.vectorstores import Chroma  
+from langchain.embeddings import OpenAIEmbeddings
+```
+
+#### Prepare examples
+
+```python 
+examples = [
+  {"input": "happy", "output": "sad"},
+  {"input": "tall", "output": "short"},
+  {"input": "energetic", "output": "lethargic"},
+]
+```
+
+#### Create selector
+
+```python
+selector = SemanticSimilarityExampleSelector.from_examples(
+  examples,
+  OpenAIEmbeddings(),
+  Chroma,
+  k=2  
 )
 ```
 
-This would select the 2 most similar examples to the input out of the provided example list, using OpenAI embeddings and Chroma for similarity search.
+This creates the selector preloaded with the examples, ready to find similar ones.
 
-The `SemanticSimilarityExampleSelector` uses a specified embedding model to encode the input and examples. It then does a nearest neighbor search using the provided vector store like Chroma to find the most similar example embeddings.
+#### Use selector
 
-## Length-Based Selector
-
-The `LengthBasedExampleSelector` selects examples based on the length of the formatted example text. It ensures the total prompt size stays within a specified limit by reducing examples for longer inputs.
-
-For example:
-
-```python
-selector = LengthBasedExampleSelector(
-  examples, example_prompt, max_length=100
-)
-```
-
-This helps avoid prompts that exceed the model's context window size. For smaller inputs, more examples are included, while longer inputs use fewer examples.
-
-## Usage
-
-Example selectors can be passed into `FewShotPromptTemplate` instead of raw examples:
+Pass the selector to FewShotPromptTemplate:
 
 ```python
 prompt = FewShotPromptTemplate(
   example_selector=selector,
-  # Other args...  
+  # ...
 )
 ```
 
-This allows the selector to dynamically choose examples each time the prompt is formatted.
+Or select examples manually:
 
-## Other Selectors
+```python
+input = "joyful"
+selected = selector.select_examples({"input": input}) 
+```
 
-LangChain also provides other selectors like `RandomExampleSelector` for randomly sampling from a pool of examples. 
+### Examples
 
-Developers can also implement custom selectors by extending the `BaseExampleSelector` class.
+#### Question Answering
+
+```python
+examples = [
+  {"question": "Who is the CEO of Apple?", "answer": "Tim Cook"},
+  {"question": "When was Python created?", "answer": "1991"},
+]
+
+selector = SemanticSimilarityExampleSelector.from_examples(examples, OpenAIEmbeddings(), Chroma, k=1) 
+
+prompt = FewShotPromptTemplate(
+   example_selector=selector,  
+   # ...
+)
+```
+
+#### Summarization
+
+```python 
+examples = [
+  {"text": "The fox jumped over the lazy dog.", "summary": "A fox jumped over a lazy dog."},
+  {"text": "Apple sells iPhones, iPads and Macbooks.", "summary": "Apple sells various electronics."}, 
+]
+
+selector = SemanticSimilarityExampleSelector.from_examples(examples, OpenAIEmbeddings(), Chroma, k=1)
+
+prompt = FewShotPromptTemplate(
+  example_selector=selector,
+  # ...  
+)
+```
+

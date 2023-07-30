@@ -2,88 +2,79 @@
 
 # Prompts
 
-The new way of programming models is through prompts. A **prompt** refers to the input to the model. This input is often constructed from multiple components. LangChain provides several classes and functions to make constructing and working with prompts easy.
+Prompts are the input provided to language models. A prompt typically contains instructions, examples, and a question or request for the model. LangChain provides tools to help construct and manage prompts.
 
 ## Prompt Templates
 
-Prompt templates allow you to parametrize and reuse model inputs. You can create a template with input variables, and generate prompts by formatting the template with values for those variables. 
+A prompt template is a reproducible way to generate a prompt dynamically. It contains a template string that can take in parameters and generate a full prompt. 
 
 For example:
 
 ```python
-from langchain import PromptTemplate
+template = "You are a {profession}. What is your advice about {topic}?"
 
-template = "Write a {length} word essay about {topic}."  
-prompt = PromptTemplate(input_variables=["length", "topic"], template=template)
+prompt = PromptTemplate(template=template, input_variables=["profession", "topic"])
 
-prompt.format(length="100", topic="artificial intelligence")
+prompt.format(profession="doctor", topic="getting more sleep")
 ```
 
-This would generate the prompt:
+Would generate the prompt:
 
-"Write a 100 word essay about artificial intelligence."
+```
+You are a doctor. What is your advice about getting more sleep?
+```
 
-LangChain includes prompt templates optimized for different use cases like chat and summarization. See the documentation for details.
+Prompt templates allow prompts to be dynamically generated from parameters. They can contain:
+
+- Instructions to the model 
+- Few shot examples
+- A question or request
+
+See the [prompt templates](/docs/modules/model_io/prompts/prompt_templates/) documentation for more details and examples.
 
 ## Chat Prompt Templates
 
-Chat models take prompts in a different format from standard LLMs - as a list of chat messages rather than raw text. 
+[Chat models](/docs/modules/model_io/models/chat/) take prompts in the form of a list of chat messages, rather than a single text string. LangChain provides `ChatPromptTemplate` to help construct prompts for chat models.
 
-LangChain provides `ChatPromptTemplate` to help build prompts for chat models. For example:
-
-```python
-from langchain.prompts.chat import ChatPromptTemplate
-
-system_template = "You are an AI assistant designed to answer questions about {topic}."
-system_prompt = SystemMessagePromptTemplate.from_template(system_template) 
-
-human_template = "What is {question}?"
-human_prompt = HumanMessagePromptTemplate.from_template(human_template)
-
-chat_prompt = ChatPromptTemplate.from_messages([system_prompt, human_prompt])
-
-chat_prompt.format(topic="artificial intelligence", question="machine learning")
-```
-
-This would generate a chat prompt with an initial system message explaining the AI's purpose, followed by a human question. 
-
-We can also construct more complex chat prompts with multiple system, AI, and human messages:
+A `ChatPromptTemplate` consists of one or more `MessagePromptTemplates` that each generate a chat message. For example:
 
 ```python
-system_1_template = "You are an AI assistant designed to have natural conversations."
-system_1_prompt = SystemMessagePromptTemplate.from_template(system_1_template)
+system_template = "You are an assistant that translates {input_language} to {output_language}."
+system_prompt = SystemMessagePromptTemplate(system_template) 
 
-human_1_template = "Hello! What is your name?"  
-human_1_prompt = HumanMessagePromptTemplate.from_template(human_1_template)
+human_template = "Hello! Can you translate this: {text}" 
+human_prompt = HumanMessagePromptTemplate(human_template)
 
-ai_1_template = "My name is Claude."
-ai_1_prompt = AIMessagePromptTemplate.from_template(ai_1_template) 
+chat_prompt = ChatPromptTemplate(messages=[system_prompt, human_prompt])
 
-human_2_template = "Claude, {question}?"
-human_2_prompt = HumanMessagePromptTemplate.from_template(human_2_template)
-
-chat_prompt = ChatPromptTemplate.from_messages([
-    system_1_prompt,
-    human_1_prompt,
-    ai_1_prompt,
-    human_2_prompt
-])
-
-chat_prompt.format(question="what is machine learning?")
+chat_prompt.format(
+   input_language="English", 
+   output_language="Spanish",
+   text="I love traveling"
+)
 ```
 
-This constructs a chat prompt with an introductory system message, two rounds of dialogue to establish context, and then a final human question. See the documentation for more details on building multi-turn conversations.
+Would generate:
 
-## Language Models 
+```
+[
+  SystemMessage(You are an assistant that translates English to Spanish.),
+  HumanMessage(Hello! Can you translate this: I love traveling)
+]
+```
 
-LangChain provides interfaces to use two types of language models:
+See the [chat prompt templates](/docs/modules/model_io/prompts/chat/) documentation for more details and examples.
 
-- **LLMs**: Take a text string as input and return a text string.
-- **Chat Models**: Take a list of chat messages and return a chat message.
+## LLMs vs Chat Models
 
-While both can be used for text generation, chat models are optimized for dialogue.
+There are two main types of models in LangChain:
 
-# Conclusion
+- **LLMs**: Take a text string as input and return a text string. For example, GPT-3.
+- **Chat Models**: Take a list of chat messages as input and return a chat message. For example, GPT-4.
 
-LangChain's prompt modules make it easy to construct dynamic, reusable prompts optimized for different models and use cases. The prompt is one of the most important parts of working with language models effectively.
+LLMs and Chat Models have slightly different interfaces, but both implement the base `BaseLanguageModel` interface in LangChain. This makes it possible to swap between LLMs and Chat Models.
+
+When using a specific model, it is best to use the model-specific methods (i.e. `predict` for LLMs). But the base interface allows writing applications that are agnostic to model type.
+
+See the [models documentation](/docs/modules/model_io/models/) for more details.
 
