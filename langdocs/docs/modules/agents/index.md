@@ -25,24 +25,32 @@ Toolkits are groups of 3-5 related tools the agent needs to accomplish a specifi
 
 ### AgentExecutor
 
-The AgentExecutor runs the agent loop:
+The AgentExecutor runs the loop that executes the agent's chosen actions. It:
 
-1. Get action from agent 
-2. Execute action (call tool)
-3. Send observation to agent
-4. Repeat until agent returns `AgentFinish`
+- Calls the agent to get the next action 
+- Executes the action tool 
+- Feeds the observation back to the agent
+- Continues until the agent returns `AgentFinish`
 
-It handles errors and logging.
+It also handles errors and logging.
 
 ## Getting Started
 
 To build a custom agent:
 
 1. Choose an [agent type](/docs/modules/agents/agent_types/) like ReAct
-2. Create a prompt with agent personality/context 
-3. Define tools for the task
-4. Construct the agent by passing the prompt, tools etc.
-5. Run the agent in an AgentExecutor
+2. Define relevant [tools](/docs/modules/agents/tools/)
+3. Create a prompt with tool info 
+4. Instantiate the agent class
+5. Run it with an AgentExecutor
 
-See the [full example](/docs/use_cases/building_conversational_agents/custom_agent.html).
+See the [custom agent example](/docs/use_cases/autonomous_agents/custom_agent.html) for sample code.
+
+## Additional Resources
+
+- [Agent types](/docs/modules/agents/agent_types/) - Details on different agent algorithms 
+- [Tools](/docs/modules/agents/tools/) - Available tools
+- [Toolkits](/docs/modules/agents/toolkits/) - Prebuilt tool groups
+- [AgentExecutor](/docs/modules/agents/agent_executor.html) - Runtime class
+- [Examples](/docs/use_cases/autonomous_agents/) - Code samples for custom agents
 
