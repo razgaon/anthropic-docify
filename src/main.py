@@ -1,3 +1,4 @@
+import os
 import logging
 import pandas as pd
 from agent import get_improved_page
@@ -42,21 +43,23 @@ def main():
     df = pd.read_csv("./data/data.csv")
     urls = get_all_paths(directory)
 
-    for url in tqdm(urls[25:30]):
+    for url in tqdm(urls[0:5]):
         # Trigger deployment
         try:
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
-
-            output = get_improved_page(reference_doc, context, reference_page_name)
-
-            name_to_save = reference_page_name.replace("-", "/").replace('_', ' ')
+            name_to_save = reference_page_name.replace("-", "/")
             
             if name_to_save.endswith("/"):
                 name_to_save += "index"
 
-            save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-            save_output(f'../docs_pages/pages/{name_to_save}.md', output)
+            if not os.path.exists(f'./docs/{name_to_save}.md'):                
+                output = get_improved_page(reference_doc, context, reference_page_name)
+
+                save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
+                save_output(f'./docs/{name_to_save}.md', output)
+            else:
+                print(f'Page {name_to_save} already exists. Skipping...')
             
         except Exception as e:
             print(f'Encountered an error improving page: f{e}')
