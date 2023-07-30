@@ -26,7 +26,7 @@ async def main():
     page_number = 1
     while True:
         print(f"Fetching page {page_number}")
-        issues_url = f"https://api.github.com/repos/{repo}/issues?per_page=100&page={page_number}"
+        issues_url = f"https://api.github.com/repos/{repo}/issues?per_page=100&page={page_number}&state=all"
         response = requests.get(issues_url, headers=headers)
         if response.status_code != 200:
             print(f"Error fetching {issues_url=}: {response.text}")
