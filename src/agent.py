@@ -9,7 +9,7 @@ load_dotenv()
 from templates import INITIAL_CRITIQUE_PAGE_TEMPLATE, IMPROVE_PAGE_TEMPLATE
 from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2, CRITIQUE_PAGE_TEMPLATE_V2
 
-chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=2048)
+chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=4096)
 
 def get_improved_page(reference_page: str, context: str, reference_page_name: str, n=1) -> str:
     # Step 1: Give initial critique
