@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from agent import get_improved_page
-from utils import LANGCHAIN_BASE, save_output, get_all_paths, get_document_urls_from_github
+from utils import LANGCHAIN_BASE, save_output, get_documentation_urls_from_github
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
@@ -37,7 +37,7 @@ def get_args(reference_df):
 
 def main():
     df = pd.read_csv("./data/data.csv")
-    urls = get_document_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "", LANGCHAIN_BASE)
+    urls = get_documentation_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "", LANGCHAIN_BASE)
 
     for url in tqdm(urls[25:30]):
         # Trigger deployment

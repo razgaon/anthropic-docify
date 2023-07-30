@@ -22,7 +22,7 @@ LANGCHAIN_BASE = "https://python.langchain.com/docs"
 
 #     return paths
 
-def get_document_urls_from_github(owner: str, repo_name: str, repo_doc_root_path: str, current_path:str, rendered_doc_base_url:str):
+def get_documentation_urls_from_github(owner: str, repo_name: str, repo_doc_root_path: str, current_path:str, rendered_doc_base_url:str):
     paths = []    
     headers = {'Authorization': f'Bearer {GITHUB_ACCESS_TOKEN}'}
     url = f'https://api.github.com/repos/{owner}/{repo_name}/contents/{repo_doc_root_path}/{current_path}'
@@ -34,7 +34,7 @@ def get_document_urls_from_github(owner: str, repo_name: str, repo_doc_root_path
             if file['type'] == 'dir':
                 # if the file is a directory, get the files in it
                 filename = os.path.basename(file['path'])
-                paths.extend(get_document_urls_from_github(owner, repo_name, repo_doc_root_path, os.path.join(current_path, filename), rendered_doc_base_url))
+                paths.extend(get_documentation_urls_from_github(owner, repo_name, repo_doc_root_path, os.path.join(current_path, filename), rendered_doc_base_url))
             elif file['name'].endswith(".mdx"):
                 rendered_doc_path = file['path'].replace(repo_doc_root_path, '').replace(".mdx", "").replace("index", "")[1:]
                 url = f"{rendered_doc_base_url}/{rendered_doc_path}"
