@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-There are a set of keys required to run this repo. Place the keys in an .env file.
+There are a set of keys required to run this repo. Place the keys in an `.env` file.
 - `ANTHROPIC_API_KEY` - powers our chains
 - `PINECONE_API_KEY` - for storing the documentation embeddings
 - `OPENAI_API_KEY` - for creating embeddings
