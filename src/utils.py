@@ -49,7 +49,8 @@ def get_documentation_urls_from_github(owner: str, repo_name: str, repo_doc_root
     return paths
 
 def get_langchain_docs_url():
-    return get_documentation_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "", LANGCHAIN_BASE)
+    # 'langchain-ai', 'langchain', 
+    return get_documentation_urls_from_github('docs/docs_skeleton/docs', "", LANGCHAIN_BASE)
 
 def save_output(output_path: str, content: str) -> None:
     # Get the parent directory
