@@ -37,7 +37,7 @@ def get_args(reference_df):
 
 def main():
     df = pd.read_csv("./data/data.csv")
-    urls = get_document_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "https://python.langchain.com")
+    urls = get_document_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "", LANGCHAIN_BASE)
 
     for url in tqdm(urls[25:30]):
         # Trigger deployment
