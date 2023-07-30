@@ -37,7 +37,8 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
         save_output(f'src/output/improvement/v{i}/{reference_page_name}.md', improved_page_xml)
         improved_page = get_answer(improved_page_xml)
         
-    
+        if i == n - 1:
+            break
         # Step 2: Given the improved page, critique it and provide feedback
         logger.info(f'Round {i}: Generating critique for {reference_page_name}')
         critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE))
