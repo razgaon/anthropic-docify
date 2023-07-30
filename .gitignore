@@ -162,7 +162,8 @@ cython_debug/
 #.idea/
 
 /chroma_db
-src/chroma/
+/src/chroma
+/chroma
 .DS_STORE
 
 /src/docs
