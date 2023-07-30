@@ -32,11 +32,13 @@ chroma_vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
 
 # PINECONE
 pinecone_config = {"environment": "us-west1-gcp-free"}
-pinecone_vector_store = PineconeVectorStore(
-    index_name="official",
-    environment=pinecone_config["environment"],
-    namespace="dev",
-)
+pinecone_vector_stores = {
+    "official": PineconeVectorStore(
+        index_name="official",
+        environment=pinecone_config["environment"],
+        namespace="dev",
+    )
+}
 
 embed_model = LangchainEmbedding(OpenAIEmbeddings())
 
@@ -104,4 +106,4 @@ def create_official_langchain_index(vector_store):
 
 
 if __name__ == "__main__":
-    create_official_langchain_index(pinecone_vector_store)
+    create_official_langchain_index(pinecone_vector_stores["official"])

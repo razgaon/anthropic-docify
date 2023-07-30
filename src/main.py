@@ -1,12 +1,10 @@
 import logging
-import chromadb
 import pandas as pd
 from agent import get_improved_page
 from utils import LANGCHAIN_BASE, save_output, get_all_paths
 from tqdm import tqdm
-
-chroma_client = chromadb.PersistentClient()
-
+from vector_store import pinecone_vector_stores, get_index
+from llama_index.retrievers import VectorIndexRetriever
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-4s [%(filename)s:%(lineno)d] %(message)s",
@@ -14,43 +12,53 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-def get_args(chroma_collection, reference_df):
-    reference_doc = reference_df['content'].iloc[0] 
-    
-    reference_page_name = reference_df['url'].iloc[0].split(LANGCHAIN_BASE + "/")[1] # will return something like /modules/chains/how_to/memory.md'
-    reference_page_name = reference_page_name.replace("/", '-') # Prevents issue with writing the file
+
+def get_args(reference_df):
+    reference_doc = reference_df["content"].iloc[0]
+
+    reference_page_name = (
+        reference_df["url"].iloc[0].split(LANGCHAIN_BASE + "/")[1]
+    )  # will return something like /modules/chains/how_to/memory.md'
+    reference_page_name = reference_page_name.replace(
+        "/", "-"
+    )  # Prevents issue with writing the file
     # If the reference page name is empty, it will default to the index page
     if reference_page_name == "":
-        reference_page_name = "index" 
-    
-    similar = chroma_collection.query(query_texts=[reference_doc], n_results=5)
-    context_list = similar.get("documents")[0]
-    context = '\n\n'.join(context_list)
-    
+        reference_page_name = "index"
+
+    index = get_index(pinecone_vector_stores["official"])
+    retriever = VectorIndexRetriever(index=index, similarity_top_k=5)
+    similar_nodes_with_scores = retriever.retrieve(reference_doc)
+    similar_nodes = [n.node for n in similar_nodes_with_scores]
+    text_from_nodes = [node.text for node in similar_nodes]
+    context = "\n\n".join(text_from_nodes)
+
     return reference_doc, context, reference_page_name
+
 
 def main():
     directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
 
-    df = pd.read_csv('./data/data.csv')
-    urls = get_all_paths(directory)    
-    chroma_collection = chroma_client.get_collection(name="official")
-    
-    for url in tqdm(urls[40:50]):
+    df = pd.read_csv("/data/data.csv")
+    urls = get_all_paths(directory)
+
+    for url in tqdm(urls[40:41]):
         try:
-            reference_df = df[df['url'] == url]
-            reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
-            
+            reference_df = df[df["url"] == url]
+            reference_doc, context, reference_page_name = get_args(reference_df)
+
             output = get_improved_page(reference_doc, context, reference_page_name)
-            
+
             name_to_save = reference_page_name.replace("-", "/")
-            if name_to_save.endswith('/'):
-                name_to_save += 'index'
-            
-            save_output(f'./output/v0/{reference_page_name}.md', reference_doc)    
+            if name_to_save.endswith("/"):
+                name_to_save += "index"
+
+            save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
             # save_output(f'./docs/{name_to_save}.md', output)
-        except:
+        except Exception as e:
+            print(e)
             pass
+
 
 if __name__ == "__main__":
     main()
