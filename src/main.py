@@ -48,10 +48,9 @@ def get_args(reference_df):
 
 def main():
     skip_existing = True
-    directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
 
     df = pd.read_csv("src/data/data.csv")
-    urls = get_all_paths(directory)
+    urls = get_langchain_docs_url()
 
     errors = []
     for url in tqdm(urls):
