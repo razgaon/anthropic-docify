@@ -14,16 +14,13 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-def get_args(chroma_collection, reference_df):
+def get_args(chroma_collection, reference_df, n_results=5):
     reference_doc = reference_df['content'].iloc[0] 
     
     reference_page_name = reference_df['url'].iloc[0].split(LANGCHAIN_BASE + "/")[1] # will return something like /modules/chains/how_to/memory.md'
     reference_page_name = reference_page_name.replace("/", '-') # Prevents issue with writing the file
-    # If the reference page name is empty, it will default to the index page
-    if reference_page_name == "":
-        reference_page_name = "index" 
     
-    similar = chroma_collection.query(query_texts=[reference_doc], n_results=5)
+    similar = chroma_collection.query(query_texts=[reference_doc], n_results=n_results)
     context_list = similar.get("documents")[0]
     context = '\n\n'.join(context_list)
     
@@ -48,7 +45,7 @@ def main():
                 name_to_save += 'index'
             
             save_output(f'./output/v0/{reference_page_name}.md', reference_doc)    
-            # save_output(f'./docs/{name_to_save}.md', output)
+            save_output(f'./docs/{name_to_save}.md', output)
         except:
             pass
 
