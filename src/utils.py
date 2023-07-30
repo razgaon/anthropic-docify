@@ -39,10 +39,11 @@ def get_documentation_urls_from_github(owner: str, repo_name: str, repo_doc_root
             elif file['name'].endswith(".mdx"):
                 rendered_doc_path = file['path'].replace(repo_doc_root_path, '').replace(".mdx", "").replace("index", "")[1:]
                 url = f"{rendered_doc_base_url}/{rendered_doc_path}"
-                paths.append(url)
                 response = requests.get(url)
                 if response.status_code != 200:
                     print(f"Error hitting {url}")
+                else:
+                    paths.append(url)
     else:
         print(f"Error getting document {url=} from github. Status Code: {response.status_code}. Response: {response.text}")
 
