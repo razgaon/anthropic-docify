@@ -3,7 +3,7 @@ import os, sys
 from typing import Any, List
 import chromadb
 import dataclasses
-from utils import get_all_paths
+from utils import get_langchain_docs_url
 from llama_index import (
     Document,
     StorageContext,
@@ -84,8 +84,7 @@ def get_index(vector_store):
 
 
 def create_official_langchain_index(vector_store):
-    directory = "/Users/allengu/langchain/docs/docs_skeleton/docs"  # replace with your directory path
-    langchain_paths = get_all_paths(directory)
+    langchain_paths = get_langchain_docs_url()
     errored = []
     urls = [*langchain_paths]
 

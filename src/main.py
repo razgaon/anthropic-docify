@@ -1,7 +1,8 @@
-import logging, os
+import os
+import logging
 import pandas as pd
 from agent import get_improved_page
-from utils import LANGCHAIN_BASE, save_output, get_all_paths
+from utils import LANGCHAIN_BASE, save_output, get_langchain_docs_url
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
@@ -14,7 +15,6 @@ logging.basicConfig(
 )
 
 SAVE_DIR = "langdocs/docs/"
-
 
 def get_args(reference_df):
     reference_doc = reference_df["content"].iloc[0]
