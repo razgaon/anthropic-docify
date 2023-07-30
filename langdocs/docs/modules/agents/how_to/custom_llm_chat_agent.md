@@ -1,7 +1,3 @@
-
-
-Here is my attempt at rewriting the reference page with the improvements:
-
 # Building a Custom LLM Agent
 
 This guide covers how to build your own custom LLM agent using LangChain. We'll go over the key components needed, provide examples and code snippets, and share tips on troubleshooting and debugging.
@@ -10,11 +6,11 @@ This guide covers how to build your own custom LLM agent using LangChain. We'll 
 
 The main pieces needed to build a custom LLM agent are:
 
-- **Prompt Template**: Instructions for the LLM on what to do  
+- **Prompt Template**: Instructions for the LLM on what to do
 - **LLM**: The language model that powers the agent
 - **Output Parser**: Parses LLM output into actions
 - **Tools**: External functions the agent can call
-- **Agent**: Combines the above components  
+- **Agent**: Combines the above components
 - **AgentExecutor**: Runs the agent loop
 
 We'll cover each section in detail below.
@@ -24,15 +20,15 @@ We'll cover each section in detail below.
 The prompt template tells the LLM how to format its output and what actions it can take.
 
 ```python
-# Example prompt template 
+# Example prompt template
 
 class MyPrompt(BasePromptTemplate):
 
   def format(self, input, tools):
-    
+
     return f"""
 
-Answer the question: {input} 
+Answer the question: {input}
 
 You have access to the following tools:
 
@@ -40,17 +36,17 @@ You have access to the following tools:
 
 Use this format:
 
-Action: {action}  
+Action: {action}
 Input: {input}
 Output: {output}
 
-Final Answer: 
+Final Answer:
 """
 ```
 
 The template should include placeholders for:
 
-- User input  
+- User input
 - Available tools
 - Action, input, output for tool invocations
 - Final answer
@@ -65,12 +61,12 @@ The output parser takes the raw LLM output and converts it into `AgentAction` an
 class MyOutputParser(AgentOutputParser):
 
   def parse(self, output):
-    
+
     if "Final Answer" in output:
       return AgentFinish(output)
-    
+
     action, input = parse_action(output)
-    return AgentAction(action, input) 
+    return AgentAction(action, input)
 ```
 
 - Use regex or string matching to parse actions
@@ -81,10 +77,10 @@ class MyOutputParser(AgentOutputParser):
 Any LLM can be used including OpenAI, Anthropic, Cohere etc.
 
 ```python
-llm = OpenAI() 
+llm = OpenAI()
 # or
 llm = Anthropic()
-``` 
+```
 
 Adjust temperature, top-p, etc to improve performance.
 
@@ -92,13 +88,13 @@ Adjust temperature, top-p, etc to improve performance.
 
 Tools are external functions the agent can invoke:
 
-```python 
+```python
 @tool
 def search(input):
   # Call search API
   return results
 
-tools = [search] 
+tools = [search]
 ```
 
 Expose tools to the agent via the prompt template.
@@ -111,18 +107,18 @@ Bring the components together into an agent:
 agent = LLMAgent(
   llm=llm,
   prompt=prompt,
-  output_parser=parser, 
+  output_parser=parser,
   tools=tools
 )
 ```
 
-## AgentExecutor 
+## AgentExecutor
 
 The executor runs the agent loop:
 
-```python 
+```python
 executor = AgentExecutor(agent=agent)
-executor.run(user_input) 
+executor.run(user_input)
 ```
 
 Pass tools again to executor to call them.
@@ -136,4 +132,3 @@ Pass tools again to executor to call them.
 - **Incorrect behaviors**: Increase temperature for more diversity. Use penalties to adjust behaviors. For example, if the agent is too verbose or repetitive.
 
 - **Logging**: Log LLM requests/responses, tool invocations, parsed actions etc for debugging. This can help narrow down where issues are occurring.
-

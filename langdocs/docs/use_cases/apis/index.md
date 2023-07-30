@@ -1,15 +1,14 @@
-
-# APIChain Reference Documentation
+# APIs
 
 ## Introduction
 
-APIChain allows using large language models (LLMs) to interact with APIs by constructing a chain of the LLM and API docs. By providing a natural language question relevant to the API documentation, APIChain can query the API and retrieve information. 
+APIChain allows using large language models (LLMs) to interact with APIs by constructing a chain of the LLM and API docs. By providing a natural language question relevant to the API documentation, APIChain can query the API and retrieve information.
 
 This reference guide will cover:
 
 - Basic usage and setup
 - Examples with OpenMeteo, TMDB, ListenNotes and more
-- Advanced querying and chaining 
+- Advanced querying and chaining
 - Customizing prompts and parsing
 
 ## Basic Usage
@@ -17,7 +16,7 @@ This reference guide will cover:
 To create an APIChain, you need:
 
 - An LLM like OpenAI
-- API documentation 
+- API documentation
 - Optional headers if authentication required
 
 ```python
@@ -26,7 +25,7 @@ from langchain.llms import OpenAI
 
 llm = OpenAI(temperature=0)
 
-chain = APIChain.from_llm_and_api_docs(llm, api_docs, headers=headers) 
+chain = APIChain.from_llm_and_api_docs(llm, api_docs, headers=headers)
 ```
 
 Construct the chain by passing the LLM, API docs, and optional headers.
@@ -42,34 +41,34 @@ response = chain.run("What is the weather in London tomorrow?")
 ### OpenMeteo
 
 ```python
-from langchain.chains.api import open_meteo_docs  
+from langchain.chains.api import open_meteo_docs
 
 chain = APIChain.from_llm_and_api_docs(llm, open_meteo_docs.OPEN_METEO_DOCS, verbose=True)
 
 response = chain.run('What is the weather like right now in Munich, Germany in degrees Fahrenheit?')
 ```
 
-This initializes a chain with the OpenMeteo docs. The query asks for the current weather in Munich in Fahrenheit. 
+This initializes a chain with the OpenMeteo docs. The query asks for the current weather in Munich in Fahrenheit.
 
 ### TMDB
 
 ```python
 import os
-os.environ['TMDB_API_KEY'] = "xxx" 
+os.environ['TMDB_API_KEY'] = "xxx"
 
 from langchain.chains.api import tmdb_docs
 headers = {"Authorization": f"Bearer {os.environ['TMDB_API_KEY']}"}
 
 chain = APIChain.from_llm_and_api_docs(llm, tmdb_docs.TMDB_DOCS, headers=headers)
 
-response = chain.run("Search for movies about 'Artificial Intelligence'") 
+response = chain.run("Search for movies about 'Artificial Intelligence'")
 ```
 
 This shows using the TMDB API by passing the API key in headers. The chain is constructed with the TMDB docs and used to search for AI movies.
 
 ### Listen Notes
 
-```python 
+```python
 import os
 listen_api_key = os.environ["LISTEN_API_KEY"]
 headers = {"X-ListenAPI-Key": listen_api_key}
@@ -98,7 +97,7 @@ The examples above show basic single queries. APIChain also supports:
 Chains for different APIs can be composed:
 
 ```python
-open_meteo_chain = APIChain(llm, open_meteo_docs) 
+open_meteo_chain = APIChain(llm, open_meteo_docs)
 tmdb_chain = APIChain(llm, tmdb_docs, headers)
 
 composed_chain = open_meteo_chain + tmdb_chain
@@ -128,9 +127,9 @@ A response parser function can extract the relevant data.
 
 The prompt can be customized per API:
 
-```python 
+```python
 prompt = PromptTemplate(
-    input="Question: {question}", 
+    input="Question: {question}",
     api_docs=api_docs,
     output="Response: {response}"
 )
@@ -143,4 +142,3 @@ This allows modifying the prompt structure.
 ## Conclusion
 
 In summary, APIChain enables seamless integration of LLMs with APIs using natural language. The examples here covered common use cases and customization techniques. With APIChain, you can leverage the knowledge of large models to query and compose APIs.
-

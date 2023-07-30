@@ -1,6 +1,4 @@
-
-
-# Building Custom LLM Agents
+# Custom LLM Agents
 
 This guide covers how to build custom LLM agents using LangChain. We'll walk through setting up the environment, tools, prompt template, output parser, LLM, stop sequence, and agent executor.
 
@@ -17,7 +15,7 @@ The agent is used in an **Agent Executor** loop:
 
 1. User input is passed to the agent
 2. The agent returns either an `AgentAction` or `AgentFinish`
-3. If it is an `AgentAction`, the executor calls the specified tool and gets an `Observation` 
+3. If it is an `AgentAction`, the executor calls the specified tool and gets an `Observation`
 4. The executor repeats the loop, passing the `AgentAction` and `Observation` back to the agent until an `AgentFinish` is returned
 
 This loop allows the agent to take multiple actions before returning a final response.
@@ -28,8 +26,8 @@ Import the necessary libraries:
 
 ```python
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
-from langchain.prompts import StringPromptTemplate  
-from langchain import OpenAI, SerpAPIWrapper, LLMChain   
+from langchain.prompts import StringPromptTemplate
+from langchain import OpenAI, SerpAPIWrapper, LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
 import re
@@ -40,13 +38,13 @@ import re
 Define any tools the agent can use:
 
 ```python
-# Search tool 
+# Search tool
 search = SerpAPIWrapper()
 
 tools = [
   Tool(
     name="Search",
-    func=search.run, 
+    func=search.run,
     description="Useful for answering questions about current events"
   )
 ]
@@ -68,7 +66,7 @@ Please follow this format:
 Question: {input}
 Thought: Think about how to answer the question
 Action: Tool to use
-Action Input: Input for the tool  
+Action Input: Input for the tool
 Observation: Result from tool
 Final Answer: Final response to the original question
 
@@ -79,14 +77,14 @@ Final Answer: Final response to the original question
 class CustomPrompt(StringPromptTemplate):
 
   def format(self, **kwargs):
-  
+
     thoughts = ""
-    
+
     for action, obs in kwargs["intermediate_steps"]:
       thoughts += f"{action.log}\nObservation: {obs}\n"
-      
+
     kwargs["agent_scratchpad"] = thoughts
-    
+
     kwargs["tools"] = "\n".join([
       f"{t.name}: {t.description}" for t in self.tools
     ])
@@ -102,7 +100,7 @@ prompt = CustomPrompt(
 
 The template provides instructions and formats the tools, previous steps, and input.
 
-## Output Parser 
+## Output Parser
 
 Parse LLM output into `AgentAction` or `AgentFinish`:
 
@@ -110,10 +108,10 @@ Parse LLM output into `AgentAction` or `AgentFinish`:
 class CustomOutputParser(AgentOutputParser):
 
   def parse(self, llm_output: str):
-  
+
     if "Final Answer:" in llm_output:
       return AgentFinish(
-        return_values={"output": llm_output.split("Final Answer:")[-1].strip()}, 
+        return_values={"output": llm_output.split("Final Answer:")[-1].strip()},
         log=llm_output
       )
 
@@ -127,7 +125,7 @@ class CustomOutputParser(AgentOutputParser):
 
     return AgentAction(
       tool=action,
-      tool_input=action_input, 
+      tool_input=action_input,
       log=llm_output
     )
 
@@ -140,7 +138,7 @@ This parses the raw LLM output into structured objects.
 
 Choose your LLM:
 
-```python 
+```python
 llm = OpenAI(temperature=0)
 ```
 
@@ -165,7 +163,7 @@ agent = LLMSingleActionAgent(
   llm_chain=llm_chain,
   output_parser=parser,
   stop=stop,
-  allowed_tools=[t.name for t in tools]   
+  allowed_tools=[t.name for t in tools]
 )
 ```
 
@@ -180,7 +178,7 @@ executor = AgentExecutor.from_agent_and_tools(
   verbose=True
 )
 
-executor.run("How many people live in Canada?") 
+executor.run("How many people live in Canada?")
 ```
 
 ## Debugging Tips
@@ -195,4 +193,3 @@ Some tips for debugging agents:
 - Adjust LLM temperature if getting inconsistent outputs
 
 Careful prompt design, output parsing, and debugging allows building effective custom agents!
-
