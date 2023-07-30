@@ -32,7 +32,6 @@ def get_args(reference_df):
     similar_nodes = [n.node for n in similar_nodes_with_scores]
     text_from_nodes = [node.text for node in similar_nodes]
     context = "\n\n".join(text_from_nodes)
-
     return reference_doc, context, reference_page_name
 
 
@@ -50,6 +49,7 @@ def main():
             output = get_improved_page(reference_doc, context, reference_page_name)
 
             name_to_save = reference_page_name.replace("-", "/")
+            
             if name_to_save.endswith("/"):
                 name_to_save += "index"
 
