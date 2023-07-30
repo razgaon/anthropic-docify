@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from agent import get_improved_page
-from utils import LANGCHAIN_BASE, save_output, get_all_paths
+from utils import LANGCHAIN_BASE, save_output, get_all_paths, get_document_urls_from_github
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
@@ -12,7 +12,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d:%H:%M:%S",
     level=logging.INFO,
 )
-
 
 def get_args(reference_df):
     reference_doc = reference_df["content"].iloc[0]
@@ -37,10 +36,8 @@ def get_args(reference_df):
 
 
 def main():
-    directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
-
     df = pd.read_csv("./data/data.csv")
-    urls = get_all_paths(directory)
+    urls = get_document_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "https://python.langchain.com")
 
     for url in tqdm(urls[25:30]):
         # Trigger deployment
