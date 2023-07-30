@@ -2,7 +2,7 @@ import os
 import logging
 import pandas as pd
 from agent import get_improved_page
-from utils import LANGCHAIN_BASE, save_output, get_all_paths
+from utils import LANGCHAIN_BASE, save_output, get_langchain_docs_url
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
@@ -13,7 +13,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d:%H:%M:%S",
     level=logging.INFO,
 )
-
 
 def get_args(reference_df):
     reference_doc = reference_df["content"].iloc[0]
@@ -38,12 +37,10 @@ def get_args(reference_df):
 
 
 def main():
-    directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
-
     df = pd.read_csv("./data/data.csv")
-    urls = get_all_paths(directory)
+    urls = get_langchain_docs_url()
 
-    for url in tqdm(urls[0:5]):
+    for url in tqdm(urls):
         # Trigger deployment
         try:
             reference_df = df[df["url"] == url]
@@ -62,7 +59,7 @@ def main():
                 print(f'Page {name_to_save} already exists. Skipping...')
             
         except Exception as e:
-            print(f'Encountered an error improving page: f{e}')
+            print(f'Encountered an error improving page {url=}: {e}')
 
 
 if __name__ == "__main__":
