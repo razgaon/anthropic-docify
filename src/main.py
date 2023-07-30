@@ -14,18 +14,17 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+SAVE_DIR = "langdocs/docs/"
+
 def get_args(reference_df):
     reference_doc = reference_df["content"].iloc[0]
 
     reference_page_name = (
         reference_df["url"].iloc[0].split(LANGCHAIN_BASE + "/")[1]
     )  # will return something like /modules/chains/how_to/memory.md'
-    reference_page_name = reference_page_name.replace(
-        "/", "-"
-    )  # Prevents issue with writing the file
     # If the reference page name is empty, it will default to the index page
-    if reference_page_name == "":
-        reference_page_name = "index"
+    if reference_page_name[-1] == "/":
+        reference_page_name += "index"
 
     index = get_index(pinecone_vector_stores["official"])
     retriever = VectorIndexRetriever(index=index, similarity_top_k=5)
@@ -37,29 +36,32 @@ def get_args(reference_df):
 
 
 def main():
-    df = pd.read_csv("./data/data.csv")
-    urls = get_langchain_docs_url()
+    skip_existing = True
+    directory = "/Users/allengu/langchain/docs/docs_skeleton/docs"  # replace with your directory path
 
-    for url in tqdm(urls):
+    df = pd.read_csv("src/data/data.csv")
+    urls = get_all_paths(directory)
+
+    errors = []
+    for url in tqdm(urls[30:50]):
         # Trigger deployment
         try:
+            print(url)
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
-            name_to_save = reference_page_name.replace("-", "/")
-            
-            if name_to_save.endswith("/"):
-                name_to_save += "index"
 
-            if not os.path.exists(f'./docs/{name_to_save}.md'):                
-                output = get_improved_page(reference_doc, context, reference_page_name)
+            output_path = f"{SAVE_DIR}/{reference_page_name}.md"
+            if skip_existing and os.path.isfile(output_path):
+                print(f"File {output_path} already exists")
+                continue
 
-                save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-                save_output(f'./docs/{name_to_save}.md', output)
-            else:
-                print(f'Page {name_to_save} already exists. Skipping...')
-            
+            output = get_improved_page(reference_doc, context, reference_page_name)
+
+            save_output(f"src/output/v0/{reference_page_name}.md", reference_doc)
+            save_output(output_path, output)
         except Exception as e:
-            print(f'Encountered an error improving page {url=}: {e}')
+            errors.append(url)
+            print(f"Encountered an error for url {url} improving page: {e}")
 
 
 if __name__ == "__main__":
