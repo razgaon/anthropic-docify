@@ -45,15 +45,15 @@ def main():
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
 
-            # output = get_improved_page(reference_doc, context, reference_page_name)
+            output = get_improved_page(reference_doc, context, reference_page_name)
 
-            # name_to_save = reference_page_name.replace("-", "/")
+            name_to_save = reference_page_name.replace("-", "/")
             
-            # if name_to_save.endswith("/"):
-            #     name_to_save += "index"
+            if name_to_save.endswith("/"):
+                name_to_save += "index"
 
-            # save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-            # save_output(f'../docs_pages/pages/{name_to_save}.md', output)
+            save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
+            save_output(f'../docs_pages/pages/{name_to_save}.md', output)
             
         except Exception as e:
             print(f'Encountered an error improving page {url=}: {e}')
