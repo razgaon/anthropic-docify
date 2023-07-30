@@ -56,11 +56,11 @@ Below are the steps to improve the reference page:
 Remember, you should output the page in markdown format. And please focus on elaborating the key concepts in the reference page.
 
 Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
-Be very detailed and write at least 500 words unless there is nothing to write about.
+Be very detailed and write at least 500 words unless there is nothing to write about. 
 
 Last but not least, do not make up something up if it doesn't exist in the context or reference page.
 
-Start.
+Your response:
 """
 
 # Added one more line on Anti-hallucination

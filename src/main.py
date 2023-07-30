@@ -36,9 +36,9 @@ def main():
         reference_df = df[df['url'] == url]
         reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
         
-        get_improved_page(reference_doc, context, reference_page_name)
+        output = get_improved_page(reference_doc, context, reference_page_name)
         
-        save_output(f'./output/v0/{reference_page_name}.md', reference_doc)
+        save_output(f'./docs/{reference_page_name.replace("-", "/")}.md', output)
 
 if __name__ == "__main__":
     main()
