@@ -26,13 +26,13 @@ Here are some criteria you should consider when reviewing and critiquing the doc
 6. Relevance and Usefulness of Examples: Are the examples relevant and do they clearly demonstrate the concept or feature they are meant to explain? Do the examples cover a range of simple to complex scenarios?
 7. Grammar and Language Use: Are there grammatical errors or awkward phrasing that makes the documentation hard to understand? Are technical terms explained or linked to further reading?
 
-Context
-{context} 
+<Context>
+{context}
+</Context> 
 
---------
-
-Official documentation:
+<official_documentation>
 {reference_page}
+</official_documentation>
 
 Now, provide the top 3 areas for improvement. Ensure your feedback is clear and actionable:
 1. 
@@ -44,7 +44,7 @@ Now, provide the top 3 areas for improvement. Ensure your feedback is clear and 
 IMPROVE_PAGE_TEMPLATE = """
 Goal: You are an expert AI agent developer who is tasked with writng comprehensive guides for your library, LangChain. 
 
-You are given context, a reference page, and critique. You need to rewrite the reference page based on the critique. You are tasked to create a new markdown page that improves on the reference page by achieving the following targets:
+You are given context, a reference page, and a list of feedback. You need to rewrite the reference page based on the critique. You are tasked to create a new markdown page that improves on the reference page by achieving the following targets:
 Targets:
 1. Adding context and relevant information from the provided context. For example, if you reference a topic, bring examples and explanations from the context to the reference page. Do not provide any information that isn't in the context.
 2. Providing more detailed explanations of concepts. For example, if the reference page provides a high-level overview of a concept, provide more details and clarity.
@@ -52,31 +52,40 @@ Targets:
 4. Ensuring a clear intro/overview and conclusion/summary. For example, if the reference page does not have a clear intro/overview and conclusion/summary, add one.
 
 Steps:
-1. Carefully read through the context, the critique and reference page
+1. Carefully read through the context, the feedback list, and the reference page
 2. Identify key concepts, explanations, examples in the reference page
 3. Supplement these with relevant information, examples from the context. Do not provide urls unless they existed in the reference page.
 4. Expand explanations of concepts with more details and clarity
 5. Structure sections and content in a logical order  
 6. Ensure a clear intro/overview and conclusion/summary
 
+When you reply, first find exact quotes in the FAQ relevant to the user's question and write them down word for word inside <thinking></thinking> XML tags.  This is a space for you to write down relevant content and will not be shown to the user.  One you are done extracting relevant quotes, answer the question.  Put your answer to the user inside <answer></answer> XML tags.
+Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
+
 <REFERENCE PAGE>
 {reference_page}
 </REFERENCE PAGE>
 
-<CRITIQUE> 
+<FEEDBACK> 
 {critique}
-</CRITIQUE>
+</FEEDBACK>
 
-When you reply, first find exact quotes in the FAQ relevant to the user's question and write them down word for word inside <thinking></thinking> XML tags.  This is a space for you to write down relevant content and will not be shown to the user.  One you are done extracting relevant quotes, answer the question.  Put your answer to the user inside <answer></answer> XML tags.
-Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
 <FAQ>
 {context}
 </FAQ>
------
-REFERENCE PAGE:
-{reference_page}
 
-BEGIN DIALOGUE
+<REFERENCE PAGE>
+{reference_page}
+</REFERENCE PAGE>
+
+
+This is how your response format should be:
+<thinking>
+YOUR THINKING
+</thinking>
+<answer>
+YOUR ANSWER
+</answer>
 """
 
 CRITIQUE_PAGE_TEMPLATE = """"
@@ -94,11 +103,13 @@ Here are some criteria you should consider when reviewing and critiquing the doc
 6. Relevance and Usefulness of Examples: Are the examples relevant and do they clearly demonstrate the concept or feature they are meant to explain? Do the examples cover a range of simple to complex scenarios?
 7. Grammar and Language Use: Are there grammatical errors or awkward phrasing that makes the documentation hard to understand? Are technical terms explained or linked to further reading?
 
-Draft documentation:
+<Draft>
 {improved_page}
+</Draft>
 
-Official Langchain documentation:
+<Official_documentation>
 {reference_page} 
+</Official_documentation>
 
 Now, provide the top 3 areas for improvement. Ensure your feedback is clear and actionable:
 1. 
