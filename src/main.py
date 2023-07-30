@@ -42,7 +42,7 @@ def main():
     df = pd.read_csv("./data/data.csv")
     urls = get_all_paths(directory)
 
-    for url in tqdm(urls[:1]):
+    for url in tqdm(urls[25:30]):
         # Trigger deployment
         try:
             reference_df = df[df["url"] == url]
@@ -56,7 +56,8 @@ def main():
                 name_to_save += "index"
 
             save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-            save_output(f'./docs/{name_to_save}.md', output)
+            save_output(f'../docs_pages/pages/{name_to_save}.md', output)
+            
         except Exception as e:
             print(f'Encountered an error improving page: f{e}')
 
