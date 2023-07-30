@@ -36,12 +36,13 @@ def main():
             reference_df = df[df['url'] == url]
             reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
             
-            # output = get_improved_page(reference_doc, context, reference_page_name)
+            output = get_improved_page(reference_doc, context, reference_page_name)
             
             name_to_save = reference_page_name.replace("-", "/")
             if name_to_save.endswith('/'):
                 name_to_save += 'index'
-            print(name_to_save)
+            
+            save_output(f'./output/v0/{reference_page_name}.md', reference_doc)    
             # save_output(f'./docs/{name_to_save}.md', output)
         except:
             pass
