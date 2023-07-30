@@ -50,7 +50,7 @@ def main():
 
             output = get_improved_page(reference_doc, context, reference_page_name)
 
-            name_to_save = reference_page_name.replace("-", "/")
+            name_to_save = reference_page_name.replace("-", "/").replace('_', ' ')
             
             if name_to_save.endswith("/"):
                 name_to_save += "index"
