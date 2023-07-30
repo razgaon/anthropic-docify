@@ -28,14 +28,14 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
     logger.info(f'Generating initial critique for {reference_page_name}')        
     initial_critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(INITIAL_CRITIQUE_PAGE_TEMPLATE))
     critique = initial_critique_page_chain.run(context=context, reference_page=reference_page)
-    save_output(f'./output/initial_critique/{reference_page_name}.md', critique)
+    save_output(f'src/output/initial_critique/{reference_page_name}.md', critique)
     
     for i in range(1, n+1):            
         # Step 1: Given context and a reference page, generate an improved page
         logger.info(f'Round {i}: Generating improved page for {reference_page_name}')
         improve_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(IMPROVE_PAGE_TEMPLATE))
         improved_page_xml = improve_page_chain.run(context=context, reference_page=reference_page, critique=critique)
-        save_output(f'./output/improvement/v{i}/{reference_page_name}.md', improved_page_xml)
+        save_output(f'src/output/improvement/v{i}/{reference_page_name}.md', improved_page_xml)
         improved_page = get_answer(improved_page_xml)
         
     
@@ -43,7 +43,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
         logger.info(f'Round {i}: Generating critique for {reference_page_name}')
         critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE_V2))
         critique = critique_page_chain.run(context=context, reference_page=reference_page, improved_page=improved_page)
-        save_output(f'./output/final_critique/v{i}/{reference_page_name}.md', critique)
+        save_output(f'src/output/final_critique/v{i}/{reference_page_name}.md', critique)
         
         reference_page = improved_page
 
