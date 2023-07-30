@@ -11,41 +11,58 @@ Instructions basics:
 
 """
 
+# Add Anti-hallucination instructions
 IMPROVE_PAGE_TEMPLATE_V2 = """
-Goal: You are an expert AI agent developer who is tasked with writng comprehensive guides for your library, LangChain. 
+Goal: You are an expert in developing in Langchain, a framework for developing applications powered by large language models. You are tasked with improve LangChain documentation. 
 
+Below is some context:
 <context>
 {context}
 </context>
 
+Below is the reference page:
 <reference_page>
 {reference_page}
 </reference_page>
 
-You are given some context specified in <context> and a reference page specified in <reference_page> to improve on. You are tasked to create a new markdown page that improves on the reference page by:
+Below is the critique about the reference page:
+<critique>
+{critique}
+</critique>
+
+You are given context, a reference page, and critique about the reference page. You are tasked to rewrite and create a new markdown page that improves on the reference page by achieving the following targets:
+
+<targets>
 1. Adding context and relevant information from the provided context. For example, if you reference a topic, bring examples and explanations from the context to the reference page.
 2. Providing more detailed explanations of concepts. For example, if the reference page provides a high-level overview of a concept, provide more details and clarity.
 3. Adding code examples where applicable. For example, if the reference page provides a code snippet, add more code examples to illustrate the concept.
 4. Ensuring a logical structure and clear organization. For example, if the reference page is not well-structured, re-organize the content into a logical order.
 5. Using consistent formatting and markdown syntax. For example, if the reference page uses inconsistent formatting, ensure consistent formatting and markdown syntax.
 6. Ensuring a clear intro/overview and conclusion/summary. For example, if the reference page does not have a clear intro/overview and conclusion/summary, add one.
+</targets>
 
-Steps:
+Below are the steps to improve the reference page:
+<steps>
 1. Carefully read through the context and reference page
 2. Identify key concepts, explanations, examples in the reference page
-3. Supplement these with relevant information, examples from the context
+3. Supplement these with relevant information, examples from the context. Do not make up something up if the content you plan to add doesn't exist in the context or reference page
 4. Expand explanations of concepts with more details and clarity
 5. Add code examples where applicable to illustrate concepts
 6. Structure sections and content in a logical order  
 7. Use consistent formatting, markdown headers, code blocks
 8. Ensure a clear intro/overview and conclusion/summary
+</steps>
 
-
-You are given a context and a reference page to improve on. Add examples, details, and explanations from the context and the reference page to create the best guide possible.
 Remember, you should output the page in markdown format.
 
-Begin:
+Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
+Be very detailed and write at least 500 words unless there is nothing to write about.
+
+Last but not least, do not make up something up if it doesn't exist in the context or reference page.
+
+Start.
 """
+
 
 CRITIQUE_PAGE_TEMPLATE_V2 = """"
 You are an expert in Langchain, a framework for developing applications powered by large language models. 
