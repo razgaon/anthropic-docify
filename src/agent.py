@@ -13,7 +13,7 @@ from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2, CRITIQUE_PAGE_TEMPLATE_V2
 
 logger = logging.getLogger(__name__)
 
-chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=4096)
+chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=8192)
 
 def get_answer(response: str):
     root = ET.fromstring(f'<root>{response}</root>')
