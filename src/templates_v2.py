@@ -45,7 +45,7 @@ Below are the steps to improve the reference page:
 <steps>
 1. Carefully read through the context and reference page
 2. Identify key concepts, explanations, examples in the reference page
-3. Supplement these with relevant information, explanations and examples from the context. Do not make up something up if the content you plan to add doesn't exist in the context or reference page
+3. Supplement the key concepts with relevant information, explanations and examples from the context. Do not make something up if the content you plan to add doesn't exist in the context or reference page
 4. Expand explanations of concepts with more details and clarity
 5. Add code examples where applicable to illustrate concepts
 6. Structure sections and content in a logical order  
@@ -53,7 +53,7 @@ Below are the steps to improve the reference page:
 8. Ensure a clear intro/overview and conclusion/summary
 </steps>
 
-Remember, you should output the page in markdown format. And focus on elaborating the key concepts in the reference page.
+Remember, you should output the page in markdown format. And please focus on elaborating the key concepts in the reference page.
 
 Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
 Be very detailed and write at least 500 words unless there is nothing to write about.
