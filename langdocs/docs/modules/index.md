@@ -1,6 +1,4 @@
-
-
-# LangChain Documentation 
+# Modules
 
 ## Introduction
 
@@ -52,7 +50,7 @@ For example, a directive could be: "Answer the question based on the provided co
 LangChain supports common use cases like:
 
 - [Chatbots](/docs/use_cases/chatbots/)
-- [Question answering](/docs/use_cases/question_answering/)  
+- [Question answering](/docs/use_cases/question_answering/)
 - [Data analysis](/docs/use_cases/tabular.html)
 
 See the [use cases](/docs/use_cases/) section for details and code examples.
@@ -64,4 +62,3 @@ The [gallery](https://github.com/kyrolabs/awesome-langchain) contains many sampl
 - Join us on [GitHub](https://github.com/hwchase17/langchain) to contribute
 - Follow [LangChain on Twitter](https://twitter.com/langchain) for updates
 - Join the [Discord](https://discord.gg/6adMQxSpJS) to connect with the community
-

@@ -1,111 +1,32 @@
 
 
-# LangChain Documentation
+# Model I/O
 
-## Overview
+The core element of any language model application is...the model. LangChain provides interfaces and integrations for two main types of models:
 
-LangChain is a Python library for building applications with large language models like GPT-3 and Claude. This documentation provides guides and references to help you develop LangChain applications.
+## LLMs 
 
-## Getting Started
+LLMs (Language Models) are models that take a text string as input and return a text string completion. For example, OpenAI's GPT-3 is implemented as an LLM in LangChain. The LLM APIs wrap a call that takes a prompt string and returns a completion string.
 
-### Installation
+## Chat Models
 
-Install LangChain via pip:
+Chat models are often backed by LLMs but tuned specifically for having conversations. Crucially, their provider APIs expose a different interface than pure text completion models. Instead of a single string, chat models take a list of chat messages as input and return a chat message as output. The messages are labeled with the speaker, usually "System", "AI", or "Human". Examples of chat models are GPT-4 and Anthropic's Claude.
 
-```bash
-pip install langchain
-```
+## Prompt Templates
 
-LangChain requires Python 3.7+. 
+Most LLM applications do not pass user input directly to a model. Usually they will add the user input to a larger prompt template that provides additional context on the specific task. PromptTemplates in LangChain help bundle up the logic for going from user input to a fully formatted prompt for the model.
 
-### Hello World
+## Output Parsers 
 
-Here is a simple script to load a model and make a prediction:
+OutputParsers convert the raw text output of an LLM into a structured format that can be used by the application. For example, parsing JSON or a comma separated list.
 
-```python
-from langchain import LLMChain, PromptTemplate
+## LLMChain
 
-prompt = PromptTemplate(input="Hello world!")
+The core building block of LangChain applications is the LLMChain. This combines:
 
-chain = LLMChain(llm="text-davinci-003", prompt=prompt)
+- An LLM (the core reasoning engine)
+- Prompt Templates (to provide instructions to the LLM)  
+- Output Parsers (to parse the raw LLM output)
 
-print(chain.run())
-```
-
-This loads the GPT-3 Davinci text completion model, passes it the prompt "Hello world!", and prints the model's response.
-
-For a more in-depth example, see the [Basic Usage](/docs/use_cases/basic_usage) guide.
-
-## Core Concepts
-
-The core concepts in LangChain are:
-
-### Prompts
-
-Prompts are the inputs passed to models. The [Prompt](/docs/modules/model_io/prompts) module provides ways to parametrize and structure prompts.
-
-For example:
-
-```python
-from langchain import PromptTemplate
-
-prompt = PromptTemplate(
-    input="Summarize this text:",
-    output="Here is a summary:"  
-)
-
-print(prompt.format(text="Two roads diverged in a yellow wood..."))
-```
-
-This uses a `PromptTemplate` to format the input text into a prompt that asks the model to summarize it. See the [PromptTemplates](/docs/modules/model_io/prompts/prompt_templates) page for more details.
-
-### Models
-
-The [Models](/docs/modules/model_io/models) module provides interfaces to connect with LLMs like GPT-3 and Claude.
-
-For example:
-
-```python
-from langchain import OpenAI
-
-llm = OpenAI(model_name="text-davinci-003")
-
-response = llm.predict(prompt="Hello world!")
-```
-
-This loads the GPT-3 Davinci model and calls `.predict()` to generate a response. See the [LLMs](/docs/modules/model_io/models/llms) page for more details.
-
-### Output Parsers
-
-[Output parsers](/docs/modules/model_io/output_parsers) extract structured information from model responses.
-
-For example:
-
-```python
-from langchain import OpenAI, PromptTemplate, LLMChain
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-
-prompt = PromptTemplate(input="Hello {name}!")
-llm = OpenAI(model_name="text-davinci-003")
-
-chain = LLMChain(llm=llm, prompt=prompt, output_parser=HumanNameParser())
-
-response = chain.run(name="Alice")
-print(response.parsed) # "Alice"
-```
-
-This parses the name from the model's response. See [OutputParsers](/docs/modules/model_io/output_parsers) for more.
-
-## Documentation
-
-- [Modules](/docs/modules)
-    - [Model I/O](/docs/modules/model_io)
-        - [Prompts](/docs/modules/model_io/prompts)
-        - [Models](/docs/modules/model_io/models)
-        - [Output Parsers](/docs/modules/model_io/output_parsers)
-    - Other modules: Chains, Data, Memory, etc
-- [Use Cases](/docs/use_cases) - End-to-end examples and guides
-- [API Reference](/docs/api) - Technical reference for all functions and classes
+Understanding these key concepts will enable you to customize LangChain applications by swapping out the LLM and modifying the prompts.
 
