@@ -1,16 +1,11 @@
 import pickle
 import pandas as pd
-from utils import get_all_paths
+from utils import get_langchain_docs_url
 from tqdm import tqdm
 from crawler import WebpageCrawler, SourceType
-from chroma import add_collection
     
-    
-
-
 def crawl():
-    directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
-    langchain_paths = get_all_paths(directory)
+    langchain_paths = get_langchain_docs_url()
     errored = []
     urls = [*langchain_paths]
 
@@ -26,10 +21,9 @@ def crawl():
             errored.append(url)
             print(f"Error on {url}")
             
-    add_collection("official", sources)
     # TO CSV
-    # df = pd.DataFrame(sources)
-    # df.to_csv("./data/data.csv", index=False)
+    df = pd.DataFrame(sources)
+    df.to_csv("./data/data.csv", index=False)
 
     # Keep track of urls that errored
     with open("./data/errored.pickle", "wb") as file:
