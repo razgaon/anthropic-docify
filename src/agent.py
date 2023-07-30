@@ -6,10 +6,17 @@ from utils import save_output
 
 load_dotenv()
 
-from templates import CRITIQUE_PAGE_TEMPLATE, INITIAL_CRITIQUE_PAGE_TEMPLATE
-from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2
+from templates import INITIAL_CRITIQUE_PAGE_TEMPLATE
+from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2, CRITIQUE_PAGE_TEMPLATE_V2
 
 chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=2048)
+
+"""
+TODO:
+
+- Add a few more rounds that improve the documentation with different but relevant contexts
+
+"""
 
 def get_improved_page(reference_page: str, context: str, reference_page_name: str, n=1) -> str:
     
@@ -28,7 +35,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
     
         # Step 2: Given the improved page, critique it and provide feedback
         print(f'Round {i}: Generating critique for {reference_page_name}')
-        critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE))
+        critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE_V2))
         critique = critique_page_chain.run(context=context, reference_page=reference_page, improved_page=improved_page)
         save_output(f'./output/final_critique/v{i}/{reference_page_name}.md', critique)
 
