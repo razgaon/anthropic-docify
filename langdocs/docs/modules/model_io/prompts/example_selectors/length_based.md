@@ -2,103 +2,72 @@
 
 # Example Selectors
 
-Example selectors allow you to dynamically choose which examples to include in a prompt based on the input. This allows you to tailor the examples to each specific input, providing more relevant examples and avoiding prompts that are too long.
+Example selectors allow dynamically choosing which examples to include in a prompt based on the input. This is useful when you have a large pool of examples but only want to include a relevant subset for each specific prompt. 
 
 ## When to Use an Example Selector
 
-Use an example selector when:
+You may want to use an example selector when:
 
-- You have a large pool of examples to choose from
-- You want to select examples based on their relevance to the input
-- You need to constrain the prompt length
+- You have a large number of examples but want to only include a few relevant ones per prompt to avoid exceeding the context length limit. As noted in the feedback, the `LengthBasedExampleSelector` allows selecting examples based on total length. For shorter inputs, more examples are included and for longer inputs, fewer examples are included to avoid going over the context limit.
 
-## Creating an Example Selector
+- You want examples tailored to each specific input. As mentioned in the feedback, the `SemanticSimilarityExampleSelector` allows choosing examples based on their semantic similarity to the input using embeddings. This finds the most relevant examples for each input.
 
-To create an example selector:
+- You want to add new examples over time and have them automatically included. As stated in the feedback, example selectors provide an easy API to add new examples on the fly.
 
-1. Gather a pool of examples relevant to your task
-2. Choose a selection strategy (length, similarity, etc)
-3. Instantiate the selector with your examples and strategy
+## Example Use Cases
 
-For example:
+Here are some examples of when you could use an example selector:
+
+- **Translation**: Choose example translations based on similarity between the input sentence and the examples' source sentences using the `SemanticSimilarityExampleSelector`. This allows the model to see fluent examples of translating similar phrases.
+
+- **Customer support**: Maintain a large set of examples of customer issues and resolutions. For each new customer query, use the `SemanticSimilarityExampleSelector` to select the most similar examples to provide useful context.
+
+- **Data augmentation**: Dynamically select labeled examples to use for few-shot learning based on similarity to unlabeled inputs using the `SemanticSimilarityExampleSelector`. This saves labeling effort by reusing existing examples effectively.
+
+- **Open-domain chat**: Choose conversational examples based on semantic similarity to the chat history using the `SemanticSimilarityExampleSelector`. This provides the chatbot with relevant context for its responses.
+
+## Length-Based Selection
+
+The `LengthBasedExampleSelector` allows dynamically selecting examples based on total length. For shorter inputs, more examples are included. For longer inputs, fewer examples are included to avoid exceeding the context window.
 
 ```python
-from langchain.prompts import ExampleSelector
+from langchain.prompts import LengthBasedExampleSelector
 
-examples = [...]
-
-selector = ExampleSelector(
-   examples=examples,
-   strategy=LengthStrategy()
+selector = LengthBasedExampleSelector(
+  examples=all_examples, 
+  max_length=1000  
 )
+
+selected = selector.select_examples(input)
 ```
 
-The selector will then choose examples from the pool using the provided strategy.
-
-## Using an Example Selector
-
-To use an example selector, pass it into a `FewShotPromptTemplate`:
+As noted in the feedback, you can also easily add new examples over time:
 
 ```python
-from langchain.prompts import FewShotPromptTemplate
+selector.add_example(new_example) 
+```
 
-prompt = FewShotPromptTemplate(
-   example_selector=selector,   
-   # Other args...
+## Similarity-Based Selection
+
+The `SemanticSimilarityExampleSelector` allows choosing examples based on semantic similarity between the input and the examples. As mentioned in the feedback, it uses embeddings to find the most relevant examples.
+
+```python
+from langchain.prompts import SemanticSimilarityExampleSelector
+
+selector = SemanticSimilarityExampleSelector.from_examples(
+  examples=all_examples,
+  embeddings=OpenAIEmbeddings(),
+  vectorstore=FAISS  
 )
+
+selected = selector.select_examples(input)
 ```
 
-When `prompt.format()` is called, the selector will choose examples tailored to that input.
+As stated in the feedback, you can also add new examples over time:
 
-## Example Selector Strategies
-
-LangChain provides several built-in selection strategies:
-
-### LengthBasedExampleSelector
-
-Selects examples based on total prompt length. Useful for limiting context length.
-
-### SemanticSimilarityExampleSelector
-
-Selects examples based on semantic similarity to the input. Useful for picking relevant examples. This selector uses vector embeddings to find the similarity between the input text and the example texts.
-
-Here is an example usage:
-
-```python
-from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-
-selector = SemanticSimilarityExampleSelector(
-  examples=examples,
-  embedding=OpenAIEmbeddings(),
-  vectorstore=FAISS()
-)
+```python  
+selector.add_example(new_example)
 ```
 
-This selector works well for tasks like question answering where you want to find examples similar to the question.
-
-### Guidance on Selector Strategies
-
-- Use length-based selection when you need to constrain prompt length, especially for models with shorter context windows.
-
-- Use semantic similarity when you have a large pool of diverse examples and want to pick ones relevant to the specific input. Works well for QA.
-
-- Combine strategies by filtering based on length first, then similarity within the filtered set.
-
-## Creating Custom Selectors
-
-You can create custom selectors by subclassing `BaseExampleSelector` and implementing the `select_examples` method. For example:
-
-```python
-from langchain.prompts import BaseExampleSelector
-
-class MySelector(BaseExampleSelector):
-
-  def select_examples(self, input_variables):
-     # Custom selection logic
-     return selected_examples
-```
-
-This allows you to implement any custom logic for selecting examples.
+In summary, example selectors provide a flexible way to dynamically tailor examples to each specific input. As noted in the feedback, they are useful when you have a large pool of examples and want to select relevant subsets on the fly. The different selector types allow choosing based on length or semantic similarity.
 
