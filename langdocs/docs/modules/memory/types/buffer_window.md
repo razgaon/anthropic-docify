@@ -1,136 +1,126 @@
 
-# RetrievalQA Guide
 
-RetrievalQA allows you to perform question answering by retrieving relevant documents from a vectorstore and using an LLM to generate an answer. This guide provides a comprehensive overview of using RetrievalQA with examples.
+# Conversation Buffer Window Memory
 
-## Setup
+`ConversationBufferWindowMemory` keeps a sliding window of the most recent K interactions in a conversation. This can be useful for limiting the memory size, rather than storing the full history.
 
-To use RetrievalQA, you first need to:
+## Usage
 
-1. Load documents
-2. Embed documents 
-3. Index documents into a vectorstore
+Let's explore the basics of using this memory type.
 
-### Indexing Best Practices
+First we initialize the memory, setting the window size k. The default is k=10.
 
-To optimize performance, follow these best practices when indexing:
+```python
+from langchain.memory import ConversationBufferWindowMemory
 
-- Use a powerful embedding model like OpenAI Embeddings that can capture semantic meaning
-- Pick a chunk size that balances performance and accuracy. Around 1000 tokens is a good starting point.
-- Use an overlap of 0 tokens between chunks to avoid duplicating content
-- Limit index size to improve query speed. 100k documents is a good target.
+memory = ConversationBufferWindowMemory(k=5)  
+```
+
+We can then save chat messages to the memory. This adds them to the buffer.
+
+```python
+memory.save_context({"input": "Hello"}, {"output": "Hi there!"})
+```
+
+To load the memory, we call `load_memory_variables`. This will return the most recent k messages.
+
+```python
+memory.load_memory_variables({})
+```
+
+```
+{'history': 'Human: Hello\nAI: Hi there!'}
+```
+
+We can also return the messages as a list by setting `return_messages=True`.
+
+```python
+memory = ConversationBufferWindowMemory(k=5, return_messages=True)
+
+memory.load_memory_variables({})
+```
+
+``` 
+{'history': [HumanMessage(content='Hello'), AIMessage(content='Hi there!')]}
+```
+
+## Edge Case Behavior
+
+If k is set higher than the current length of the message history, `load_memory_variables` will return the full history rather than truncating.
 
 For example:
 
 ```python
-from langchain.chains import RetrievalQA
-from langchain.document_loaders import TextLoader
-from langchain.embeddings.openai import OpenAIEmbeddings  
+memory = ConversationBufferWindowMemory(k=10)
+
+memory.save_context({"input": "Hi"}, {"output": "Hello!"}) 
+
+memory.load_memory_variables({})
+```
+
+This will return:
+
+```
+{'history': 'Human: Hi\nAI: Hello!'}
+```
+
+Rather than truncating since k > number of messages.
+
+## Initializing from Existing Messages
+
+Rather than saving messages within the chain, we can initialize the memory directly from a `ChatMessageHistory`.
+
+```python
+from langchain.memory import ChatMessageHistory
+
+history = ChatMessageHistory()
+history.add_user_message("Hello")  
+history.add_ai_message("Hi there!")
+
+memory = ConversationBufferWindowMemory.from_messages(chat_memory=history)
+```
+
+Now when we load variables, it will include the initialized messages.
+
+## Using in a Chain
+
+Let's look at using this memory type in a conversation chain.
+
+We'll initialize the memory and chain:
+
+```python
 from langchain.llms import OpenAI
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain.chains import ConversationChain
 
-loader = TextLoader("../../state_of_the_union.txt")
-documents = loader.load()
-
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-texts = text_splitter.split_documents(documents)
-  
-embeddings = OpenAIEmbeddings() 
-docsearch = Chroma.from_documents(texts, embeddings)
+memory = ConversationBufferWindowMemory(k=2)
+chain = ConversationChain(
+   llm=OpenAI(),
+   memory=memory
+)
 ```
 
-## Chain Types
+Now when we call `predict`, the prompt will be augmented with the messages saved to memory.
 
-RetrievalQA supports different chain types that determine how the retrieved documents are processed by the LLM:
+```python 
+chain.predict(input="Hello")
 
-- `stuff`: Stuff relevant context into the prompt
-- `map_reduce`: Map/reduce style - ask for each document separately  
-- `tl;dr`: Ask for a summary of the most relevant documents
-- `refine`: Iteratively refine the answer with most relevant docs
-
-To use a specific chain type:
-
-```python  
-qa = RetrievalQA.from_chain_type(llm=OpenAI(), chain_type="map_reduce", retriever=docsearch.as_retriever())
+chain.predict(input="How are you?") 
 ```
 
-You can also directly load the chain and pass it to RetrievalQA:
+The second prediction's prompt will contain the previous message history based on the window k:
 
-```python
-from langchain.chains.question_answering import load_qa_chain
-
-qa_chain = load_qa_chain(OpenAI(), chain_type="stuff")
-qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=docsearch.as_retriever())
+```
+Human: How are you?
+AI: I'm doing great, thanks for asking!
 ```
 
-This allows full control over the chain parameters.
+## Summary
 
-## Custom Prompts
+The key points of `ConversationBufferWindowMemory` are:
 
-You can pass custom prompts to RetrievalQA:
-
-```python
-from langchain.prompts import PromptTemplate
-
-prompt_template = """
-Use the following context to answer the question:
-
-{context}
-
-Question: {question}
-Answer:
-"""
-
-prompt = PromptTemplate(template=prompt_template,
-                        input_variables=["context", "question"])
-
-qa = RetrievalQA.from_chain_type(llm=OpenAI(),
-                                 chain_type="stuff",
-                                 retriever=docsearch.as_retriever(),
-                                 chain_type_kwargs={"prompt": prompt})
-                                 
-query = "What did the president say about Ketanji Brown Jackson?"
-result = qa.run(query)
-print(result)
-```
-
-This shows how to pass the custom prompt to RetrievalQA and call run() to use it.
-
-## Return Source Documents
-
-To return source documents used to generate the answer:
-
-```python
-qa = RetrievalQA.from_chain_type(llm=OpenAI(), chain_type="stuff", retriever=docsearch.as_retriever(), return_source_documents=True)
-
-result = qa({"query": query})
-print(result["result"])
-print(result["source_documents"]) 
-```
-
-## RetrievalQAWithSourcesChain
-
-To directly cite sources in the answer, use `RetrievalQAWithSourcesChain`:
-
-```python
-from langchain.chains import RetrievalQAWithSourcesChain
-
-chain = RetrievalQAWithSourcesChain.from_chain_type(OpenAI(), chain_type="stuff", retriever=docsearch.as_retriever())
-
-result = chain({"question": "What did the president say about Justice Breyer?"}, return_only_outputs=True)
-print(result["answer"]) 
-print(result["sources"])
-```
-
-You can customize the formatting of cited sources by passing a `format_source` function:
-
-```python
-def format_source(source):
-    return f"Source: Page {source['metadata']['lookup_index']}"
-
-chain = RetrievalQAWithSourcesChain(..., format_source_fn=format_source) 
-```
-
-This provides a comprehensive guide to using RetrievalQA with examples for chain types, custom prompts, returning sources, and citing sources directly. The guide is structured logically and ensures complete coverage of all key RetrievalQA features.
+- It maintains a sliding window of the most recent k messages
+- k controls how much history is retained  
+- Can be initialized from existing ChatMessageHistory
+- Works seamlessly in conversation chains
+- If k is higher than current history, full history is returned
 
