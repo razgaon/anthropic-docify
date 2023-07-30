@@ -16,8 +16,13 @@ logging.basicConfig(
 
 def get_args(chroma_collection, reference_df):
     reference_doc = reference_df['content'].iloc[0] 
+    
     reference_page_name = reference_df['url'].iloc[0].split(LANGCHAIN_BASE + "/")[1] # will return something like /modules/chains/how_to/memory.md'
     reference_page_name = reference_page_name.replace("/", '-') # Prevents issue with writing the file
+    # If the reference page name is empty, it will default to the index page
+    if reference_page_name == "":
+        reference_page_name = "index" 
+    
     similar = chroma_collection.query(query_texts=[reference_doc], n_results=5)
     context_list = similar.get("documents")[0]
     context = '\n\n'.join(context_list)
