@@ -82,7 +82,6 @@ Remember to add detailed examples, explanations, and code snippets where applica
 Start.
 """
 
-# TOOD: Context and examples 
 CRITIQUE_PAGE_TEMPLATE = """"
 You are an expert in Langchain, a framework for developing applications powered by large language models. 
 
