@@ -1,5 +1,5 @@
 import logging
-import sys
+import os, sys
 from typing import Any, List
 import chromadb
 import dataclasses
@@ -12,7 +12,7 @@ from llama_index import (
     LangchainEmbedding,
 )
 from llama_index.embeddings import OpenAIEmbedding
-from llama_index.vector_stores import ChromaVectorStore
+from llama_index.vector_stores import ChromaVectorStore, PineconeVectorStore
 from llama_index.node_parser import SimpleNodeParser
 from langchain.embeddings import OpenAIEmbeddings
 from custom_types import Source, SourceType
@@ -25,7 +25,19 @@ load_dotenv()
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
-chroma_client = chromadb.PersistentClient()
+# CHROMA
+chroma_config = {"client": chromadb.PersistentClient()}
+chroma_collection = chroma_config["client"].get_or_create_collection("official")
+chroma_vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+
+# PINECONE
+pinecone_config = {"environment": "us-west1-gcp-free"}
+pinecone_vector_store = PineconeVectorStore(
+    index_name="official",
+    environment=pinecone_config["environment"],
+    namespace="dev",
+)
+
 embed_model = LangchainEmbedding(OpenAIEmbeddings())
 
 
@@ -53,13 +65,9 @@ def get_metadatas(sources: List[Source]):
     return [s.metadata for s in sources]
 
 
-def create_index(name: str, sources: List[Source] = []):
-    chroma_collection = chroma_client.get_or_create_collection(name)
-    vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+def create_index(vector_store, sources: List[Source] = []):
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
-    service_context = ServiceContext.from_defaults(
-        embed_model=embed_model, chunk_size=8191
-    )
+    service_context = ServiceContext.from_defaults(embed_model=embed_model)
     documents = get_documents(sources)
     index = VectorStoreIndex.from_documents(
         documents=documents,
@@ -69,15 +77,13 @@ def create_index(name: str, sources: List[Source] = []):
     return index
 
 
-def get_index(name: str):
-    chroma_collection = chroma_client.get_collection(name)
-    vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+def get_index(vector_store):
     return VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
 
-def create_official_langchain_index():
+def create_official_langchain_index(vector_store):
     directory = "/Users/allengu/langchain/docs/docs_skeleton/docs"  # replace with your directory path
-    langchain_paths = get_all_paths(directory)[:]
+    langchain_paths = get_all_paths(directory)
     errored = []
     urls = [*langchain_paths]
 
@@ -93,10 +99,9 @@ def create_official_langchain_index():
             errored.append(url)
             print(f"Error on {url}, {e}")
 
-    index = create_index("official", sources)
+    index = create_index(vector_store, sources)
     return index
 
 
 if __name__ == "__main__":
-    # chroma_client.delete_collection("official")
-    create_official_langchain_index()
+    create_official_langchain_index(pinecone_vector_store)
