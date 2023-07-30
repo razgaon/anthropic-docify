@@ -6,7 +6,8 @@ from utils import save_output
 
 load_dotenv()
 
-from templates import CRITIQUE_PAGE_TEMPLATE, IMPROVE_PAGE_TEMPLATE, INITIAL_CRITIQUE_PAGE_TEMPLATE
+from templates import CRITIQUE_PAGE_TEMPLATE, INITIAL_CRITIQUE_PAGE_TEMPLATE
+from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2
 
 chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=2048)
 
@@ -21,7 +22,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
         
         # Step 2: Given context and a reference page, generate an improved page
         print(f'Round {i}: Generating improved page for {reference_page_name}')
-        improve_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(IMPROVE_PAGE_TEMPLATE))
+        improve_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(IMPROVE_PAGE_TEMPLATE_V2))
         improved_page = improve_page_chain.run(context=context, reference_page=reference_page, critique=initial_critique)
         save_output(f'./output/improvement/v{i}/{reference_page_name}.md', improved_page)
     
@@ -33,7 +34,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
 
         # Step 3: Given an improved page and critique, generate a new improved page
         print(f'Round {i}: Generating improved page for {reference_page_name}')
-        feedback_improve_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(IMPROVE_PAGE_TEMPLATE))
+        feedback_improve_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(IMPROVE_PAGE_TEMPLATE_V2))
         final_page = feedback_improve_page_chain.run(context=context, reference_page=improved_page, critique=critique)
         save_output(f'./output/final/v{i}/{reference_page_name}.md', final_page)
 
