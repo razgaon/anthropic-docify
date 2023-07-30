@@ -3,6 +3,7 @@ import chromadb
 import pandas as pd
 from agent import get_improved_page
 from utils import LANGCHAIN_BASE, save_output, get_all_paths
+from tqdm import tqdm
 
 chroma_client = chromadb.PersistentClient()
 
@@ -28,10 +29,10 @@ def main():
     urls = get_all_paths()    
     chroma_collection = chroma_client.get_collection(name="official")
     
-    for url in urls:
+    for url in tqdm(urls[:2]):
         
         reference_df = df[df['url'] == url]
-        reference_doc, context, reference_page_name = get_args(reference_df)
+        reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
         
         get_improved_page(reference_doc, context, reference_page_name)
         
