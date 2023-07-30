@@ -33,7 +33,7 @@ def main():
     urls = get_all_paths(directory)    
     chroma_collection = chroma_client.get_collection(name="official")
     
-    for url in tqdm(urls[40:50]):
+    for url in tqdm(urls[:1]):
         try:
             reference_df = df[df['url'] == url]
             reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
