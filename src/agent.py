@@ -8,8 +8,7 @@ import xml.etree.ElementTree as ET
 
 load_dotenv()
 
-from templates import INITIAL_CRITIQUE_PAGE_TEMPLATE, IMPROVE_PAGE_TEMPLATE
-from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2, CRITIQUE_PAGE_TEMPLATE_V2
+from templates import INITIAL_CRITIQUE_PAGE_TEMPLATE, IMPROVE_PAGE_TEMPLATE, CRITIQUE_PAGE_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +40,7 @@ def get_improved_page(reference_page: str, context: str, reference_page_name: st
     
         # Step 2: Given the improved page, critique it and provide feedback
         logger.info(f'Round {i}: Generating critique for {reference_page_name}')
-        critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE_V2))
+        critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(CRITIQUE_PAGE_TEMPLATE))
         critique = critique_page_chain.run(context=context, reference_page=reference_page, improved_page=improved_page)
         save_output(f'src/output/final_critique/v{i}/{reference_page_name}.md', critique)
         
