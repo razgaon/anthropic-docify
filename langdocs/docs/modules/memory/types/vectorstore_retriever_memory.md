@@ -1,124 +1,121 @@
 
 
-# RetrievalQA
+Vector store-backed memory
+==========================
 
-## Overview
+`VectorStoreRetrieverMemory` stores memories in a VectorDB and queries the top-K most "salient" docs every time it is called. 
 
-RetrievalQA is a chain in LangChain for doing question answering by first retrieving relevant documents from a vectorstore and then using those documents to generate an answer. 
+This differs from most of the other Memory classes in that it doesn't explicitly track the order of interactions.
 
-To use RetrievalQA:
+In this case, the "docs" are previous conversation snippets. This can be useful to refer to relevant pieces of information that the AI was told earlier in the conversation.
 
-1. Load documents into a vectorstore
-2. Initialize the chain by passing the vectorstore 
-3. Call `run()` with a question to get the answer
+### Initialize your VectorStore
 
-## Usage
+Depending on the store you choose, this step may look different. Consult the relevant VectorStore documentation for more details.
 
-First load documents and index them into a vectorstore:
+Here are some examples initializing different types of vector stores:
 
 ```python
-from langchain.chains import RetrievalQA
+import faiss  
+
+from langchain.document_loaders import TextLoader
+from langchain.embeddings.openai import OpenAIEmbeddings  
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import FAISS
+  
+# Load the document, split it into chunks, embed each chunk and load it into the vector store.  
+raw_documents = TextLoader('../../../state_of_the_union.txt').load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+documents = text_splitter.split_documents(raw_documents)
+db = FAISS.from_documents(documents, OpenAIEmbeddings())
+```
+
+```python
 from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings   
-from langchain.llms import OpenAI
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import Annoy
 
-loader = TextLoader("documents.txt")
-documents = loader.load()
+raw_documents = TextLoader('../../../state_of_the_union.txt').load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)   
+documents = text_splitter.split_documents(raw_documents)
 
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-texts = text_splitter.split_documents(documents)
-
-embeddings = OpenAIEmbeddings()  
-docsearch = Chroma.from_documents(texts, embeddings)
+embeddings = OpenAIEmbeddings()
+db = Annoy.from_documents(documents, embeddings) 
 ```
 
-Then initialize the RetrievalQA chain by passing the vectorstore:
+See the [Vector Stores documentation](/docs/integrations/vectorstores) for more details on initializing different types of vector stores like Weaviate, Pinecone, etc.
+
+### Create your the VectorStoreRetrieverMemory
+
+The memory object is instantiated from any VectorStoreRetriever.
 
 ```python
-qa = RetrievalQA.from_chain_type(llm=OpenAI(), chain_type="stuff", retriever=docsearch.as_retriever())
+# In actual usage, you would set `k` to be a higher value, but we use k=1 to show that  
+# the vector lookup still returns the semantically relevant information  
+retriever = vectorstore.as_retriever(search_kwargs=dict(k=1))
+memory = VectorStoreRetrieverMemory(retriever=retriever)
+  
+# When added to an agent, the memory object can save pertinent information from conversations or used tools
+memory.save_context({"input": "My favorite food is pizza"}, {"output": "that's good to know"})
+memory.save_context({"input": "My favorite sport is soccer"}, {"output": "..."}) 
+memory.save_context({"input": "I don't the Celtics"}, {"output": "ok"})
 ```
 
-Finally, ask a question to get the answer:
+### Best practices for setting k
+
+When initializing the `VectorStoreRetrieverMemory`, the `k` parameter controls how many of the most relevant memories will be retrieved each time the memory is queried. Here are some best practices for setting `k` based on your use case:
+
+- For a digital assistant use case with longer conversations, set `k` between 5-10 to provide enough context from the conversation history.
+
+- For a QA use case with many short questions/answers, set `k` between 1-3 to avoid retrieving too much irrelevant information. 
+
+- For open-domain conversations, start with a higher `k` (10+) and tune down if the model starts repeating itself or retrieving irrelevant memories.
+
+- When in doubt, start on the higher end for `k` and tune down based on the quality and relevance of retrieved memories. 
+
+- Consider the computational resources available - higher `k` means more embeddings to compute, so balance performance vs. quality of results.
+
+### Using in a chain
+
+Let's walk through an example, again setting `verbose=True` so we can see the prompt.
 
 ```python
-query = "What did the president say about Ketanji Brown Jackson?"
-result = qa.run(query)
-print(result)
-```
+llm = OpenAI(temperature=0) # Can be any valid LLM
 
-## Chain Types
+_DEFAULT_TEMPLATE = """The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.
+  
+Relevant pieces of previous conversation:  
+{history}
+  
+(You do not need to use these pieces of information if not relevant)
+  
+Current conversation:  
+Human: {input}
+AI:"""
 
-RetrievalQA supports different underlying question answering chains through the `chain_type` parameter:
+PROMPT = PromptTemplate(
+  input_variables=["history", "input"], template=_DEFAULT_TEMPLATE  
+)
 
-- `stuff`: Uses a basic prompt with extracted context.
-- `map_reduce`: Maps questions to answers independently per document.  
-- `refine`: Iteratively refines an answer using extracted context.
-
-For example, to use the `refine` chain:
-
-```python
-from langchain.chains.question_answering import load_qa_chain
-
-qa_chain = load_qa_chain(llm=OpenAI(), chain_type="refine")
-qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=docsearch.as_retriever()) 
-```
-
-## Custom Prompts
-
-You can pass custom prompts to RetrievalQA:
-
-```python
-from langchain.prompts import PromptTemplate
-
-prompt_template = """  
-{context}
-Question: {question}
-Answer:
-"""
-
-prompt = PromptTemplate(template=prompt_template,
-                        input_variables=["context", "question"])
-
-qa = RetrievalQA.from_chain_type(
-   llm=OpenAI(),
-   chain_type="stuff",
-   retriever=docsearch.as_retriever(),
-   chain_type_kwargs={"prompt": prompt}
+conversation_with_summary = ConversationChain(
+  llm=llm,    
+  prompt=PROMPT,
+  # We set a very low max_token_limit for the purposes of testing.
+  memory=memory,
+  verbose=True
 )
 ```
 
-## Returning Source Documents 
-
-To return the source documents used by RetrievalQA:
+Here is an example conversation demonstrating how the memory tracks context across multiple turns:
 
 ```python
-qa = RetrievalQA.from_chain_type(
-   llm=OpenAI(),
-   chain_type="stuff",
-   retriever=docsearch.as_retriever(),  
-   return_source_documents=True
-)
+conversation_with_summary.predict(input="Hi, my name is Perry, what's up?")
 
-result = qa.run("What did the president say about Ketanji Brown Jackson?")
-print(result["result"])  
-print(result["source_documents"])
+conversation_with_summary.predict(input="I love playing soccer")
+
+conversation_with_summary.predict(input="What's my favorite sport?") 
 ```
 
-You can also use the `RetrievalQAWithSourcesChain` to directly return sources cited:
-
-```python
-from langchain.chains import RetrievalQAWithSourcesChain
-
-chain = RetrievalQAWithSourcesChain.from_chain_type(
-    OpenAI(),
-    chain_type="stuff",
-    retriever=docsearch.as_retriever()  
-)
-
-result = chain.run("What did the president say about Ketanji Brown Jackson?") 
-print(result["answer"])
-print(result["sources"])
-```
+This shows how the memory is used to track the context that soccer is the user's favorite sport across multiple turns of the conversation.
 
