@@ -56,14 +56,12 @@ Targets:
 Steps:
 1. Carefully read through the context and reference page
 2. Identify key concepts, explanations, examples in the reference page
-3. Supplement these with relevant information, examples from the context
+3. Supplement these with relevant information, examples from the context. Do not provide urls unless they existed in the reference page.
 4. Expand explanations of concepts with more details and clarity
 5. Add code examples where applicable to illustrate concepts
 6. Structure sections and content in a logical order  
 7. Use consistent formatting, markdown headers, code blocks
 8. Ensure a clear intro/overview and conclusion/summary
-
-Remember, you should output the page in markdown format.
 
 CONTEXT: 
 {context}
@@ -80,11 +78,10 @@ CRITIQUE:
 
 
 Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
-Be very detailed and write at least 500 words unless there is nothing to write about.
+
 Start.
 """
 
-# TOOD: Context and examples 
 CRITIQUE_PAGE_TEMPLATE = """"
 You are an expert in Langchain, a framework for developing applications powered by large language models. 
 
