@@ -12,7 +12,7 @@ from templates_v2 import IMPROVE_PAGE_TEMPLATE_V2, CRITIQUE_PAGE_TEMPLATE_V2
 
 logger = logging.getLogger(__name__)
 
-chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=2048)
+chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=4096)
 
 def get_improved_page(reference_page: str, context: str, reference_page_name: str, n=1) -> str:
     # Step 1: Give initial critique
