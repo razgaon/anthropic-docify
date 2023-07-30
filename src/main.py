@@ -25,11 +25,13 @@ def get_args(chroma_collection, reference_df):
     return reference_doc, context, reference_page_name
 
 def main():
+    directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
+
     df = pd.read_csv('./data/data.csv')
-    urls = get_all_paths()    
+    urls = get_all_paths(directory)    
     chroma_collection = chroma_client.get_collection(name="official")
     
-    for url in tqdm(urls[:2]):
+    for url in tqdm(urls[:1]):
         
         reference_df = df[df['url'] == url]
         reference_doc, context, reference_page_name = get_args(chroma_collection, reference_df)
