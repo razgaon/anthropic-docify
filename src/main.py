@@ -36,7 +36,7 @@ def get_args(reference_df):
         reference_page_name += "index"
 
     index = get_index(pinecone_vector_stores["official"])
-    retriever = VectorIndexRetriever(index=index, similarity_top_k=5)
+    retriever = VectorIndexRetriever(index=index, similarity_top_k=8)
     
     similar_nodes_with_scores = retriever.retrieve(retrievel_ref_doc)
     similar_nodes = [n.node for n in similar_nodes_with_scores]
