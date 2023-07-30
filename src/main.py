@@ -6,7 +6,7 @@ from utils import LANGCHAIN_BASE, save_output, get_langchain_docs_url
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
-import xml.etree.ElementTree as ET
+from langchain.text_splitter import CharacterTextSplitter
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-4s [%(filename)s:%(lineno)d] %(message)s",
@@ -16,7 +16,7 @@ logging.basicConfig(
 
 def get_args(reference_df):
     reference_doc = reference_df["content"].iloc[0]
-
+    
     reference_page_name = (
         reference_df["url"].iloc[0].split(LANGCHAIN_BASE + "/")[1]
     )  # will return something like /modules/chains/how_to/memory.md'
@@ -29,9 +29,11 @@ def get_args(reference_df):
 
     index = get_index(pinecone_vector_stores["official"])
     retriever = VectorIndexRetriever(index=index, similarity_top_k=5)
+    
     similar_nodes_with_scores = retriever.retrieve(reference_doc)
     similar_nodes = [n.node for n in similar_nodes_with_scores]
     text_from_nodes = [node.text for node in similar_nodes]
+    
     context = "\n\n".join(text_from_nodes)
     return reference_doc, context, reference_page_name
 
@@ -50,11 +52,11 @@ def main():
             if name_to_save.endswith("/"):
                 name_to_save += "index"
 
-            if not os.path.exists(f'./docs/{name_to_save}.md'):                
+            if not os.path.exists(f'../langdocs/docs/{name_to_save}.md'):                
                 output = get_improved_page(reference_doc, context, reference_page_name)
 
                 save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-                save_output(f'./docs/{name_to_save}.md', output)
+                save_output(f'../langdocs/docs/{name_to_save}.md', output)
             else:
                 print(f'Page {name_to_save} already exists. Skipping...')
             
