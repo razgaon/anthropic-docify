@@ -12,7 +12,7 @@ chat = ChatAnthropic(model='claude-2', temperature=0, max_tokens_to_sample=2048)
 
 def get_improved_page(reference_page: str, context: str, reference_page_name: str, n=1) -> str:
     # Step 1: Give initial critique
-    print(f'Round {i}: Generating initial critique for {reference_page_name}')        
+    print(f'Generating initial critique for {reference_page_name}')        
     initial_critique_page_chain = LLMChain(llm=chat, prompt=PromptTemplate.from_template(INITIAL_CRITIQUE_PAGE_TEMPLATE))
     critique = initial_critique_page_chain.run(context=context, reference_page=reference_page)
     save_output(f'./output/initial_critique/{reference_page_name}.md', critique)
