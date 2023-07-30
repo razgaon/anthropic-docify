@@ -1,14 +1,10 @@
-
-
-# Improved LangChain Documentation
-
-## Introduction
+# Introduction
 
 LangChain is a Python framework for building applications powered by large language models (LLMs). It provides components and tools for:
 
 - **Interfacing with LLMs** - Easily load models like GPT-3 and InstructGPT using the [Model I/O](/docs/modules/model_io) module.
 
-- **Connecting data sources** - Integrate external datasets into your application using the [Data Connection](/docs/modules/data_connection) module. 
+- **Connecting data sources** - Integrate external datasets into your application using the [Data Connection](/docs/modules/data_connection) module.
 
 - **Constructing workflows** - Chain together sequences of LLM calls, data lookups, and logic using the [Chains](/docs/modules/chains) module. The Chains module allows you to construct prompts, pass user input to LLMs, and sequence calls.
 
@@ -47,7 +43,7 @@ Interface with language models like GPT-3, BLOOM, and InstructGPT. The Model I/O
 ```python
 from langchain import OpenAI
 
-llm = OpenAI() 
+llm = OpenAI()
 llm.predict("Hello world!")
 ```
 
@@ -68,7 +64,7 @@ Compose sequences of LLM prompts, data lookups, and logic. The Chains module all
 ```python
 from langchain import LLMChain, SQLDatabase
 
-db = SQLDatabase(...)  
+db = SQLDatabase(...)
 chain = LLMChain(llm=..., prompt=..., database=db)
 ```
 
@@ -76,21 +72,21 @@ chain = LLMChain(llm=..., prompt=..., database=db)
 
 Create goal-driven chains that dynamically choose tools based on high-level directives. The Agents module allows chains to interact with their environment.
 
-```python  
+```python
 from langchain import Tool, Agent
 
-agent = Agent(tools=[Tool(name="summarize", chain=...),  
+agent = Agent(tools=[Tool(name="summarize", chain=...),
                      Tool(name="search", chain=...)])
 ```
 
-### [Memory](/docs/modules/memory) 
+### [Memory](/docs/modules/memory)
 
 Persist state across chain runs like conversation context.
 
 ```python
 from langchain.memory import ConversationBufferMemory
 
-memory = ConversationBufferMemory() 
+memory = ConversationBufferMemory()
 ```
 
 ### [Callbacks](/docs/modules/callbacks)
@@ -110,4 +106,3 @@ callbacks = CallbackManager(...)
 - [Discord](https://discord.gg/6adMQxSpJS)
 - [YouTube Tutorials](/docs/additional_resources/youtube.html)
 - [Example Projects](https://github.com/kyrolabs/awesome-langchain)
-

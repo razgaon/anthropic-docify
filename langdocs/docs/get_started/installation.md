@@ -1,7 +1,4 @@
-
-Here is an improved LangChain installation guide based on the critique and relevant information from the FAQ:
-
-# LangChain Installation Guide
+# Installation
 
 ## Overview
 
