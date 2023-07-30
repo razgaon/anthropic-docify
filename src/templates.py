@@ -78,8 +78,9 @@ CRITIQUE:
 
 
 Remember to add detailed examples, explanations, and code snippets where applicable. Ensure a logical structure and clear organization. Use consistent formatting and markdown syntax. Ensure a clear intro/overview and conclusion/summary.
+Last but not least, do not make up something up if it doesn't exist in the context or reference page.
 
-Start.
+Provide only the output markdown file without any additional commentary.
 """
 
 CRITIQUE_PAGE_TEMPLATE = """"
