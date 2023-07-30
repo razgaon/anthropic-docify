@@ -5,6 +5,7 @@ from utils import LANGCHAIN_BASE, save_output, get_all_paths
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
+import xml.etree.ElementTree as ET
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-4s [%(filename)s:%(lineno)d] %(message)s",
@@ -38,10 +39,10 @@ def get_args(reference_df):
 def main():
     directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
 
-    df = pd.read_csv("/data/data.csv")
+    df = pd.read_csv("./data/data.csv")
     urls = get_all_paths(directory)
 
-    for url in tqdm(urls[40:41]):
+    for url in tqdm(urls[:1]):
         try:
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
@@ -54,10 +55,9 @@ def main():
                 name_to_save += "index"
 
             save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-            # save_output(f'./docs/{name_to_save}.md', output)
+            save_output(f'./docs/{name_to_save}.md', output)
         except Exception as e:
-            print(e)
-            pass
+            print(f'Encountered an error improving page: f{e}')
 
 
 if __name__ == "__main__":
