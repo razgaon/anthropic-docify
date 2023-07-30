@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from agent import get_improved_page
-from utils import LANGCHAIN_BASE, save_output, get_documentation_urls_from_github
+from utils import LANGCHAIN_BASE, save_output, get_langchain_docs_url
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
@@ -37,26 +37,26 @@ def get_args(reference_df):
 
 def main():
     df = pd.read_csv("./data/data.csv")
-    urls = get_documentation_urls_from_github('langchain-ai', 'langchain', 'docs/docs_skeleton/docs', "", LANGCHAIN_BASE)
+    urls = get_langchain_docs_url()
 
-    for url in tqdm(urls[25:30]):
+    for url in tqdm(urls):
         # Trigger deployment
         try:
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
 
-            output = get_improved_page(reference_doc, context, reference_page_name)
+            # output = get_improved_page(reference_doc, context, reference_page_name)
 
-            name_to_save = reference_page_name.replace("-", "/")
+            # name_to_save = reference_page_name.replace("-", "/")
             
-            if name_to_save.endswith("/"):
-                name_to_save += "index"
+            # if name_to_save.endswith("/"):
+            #     name_to_save += "index"
 
-            save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
-            save_output(f'../docs_pages/pages/{name_to_save}.md', output)
+            # save_output(f"./output/v0/{reference_page_name}.md", reference_doc)
+            # save_output(f'../docs_pages/pages/{name_to_save}.md', output)
             
         except Exception as e:
-            print(f'Encountered an error improving page: f{e}')
+            print(f'Encountered an error improving page {url=}: {e}')
 
 
 if __name__ == "__main__":
