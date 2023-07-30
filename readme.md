@@ -32,10 +32,10 @@ pip install -r requirements.txt
 ## Usage
 
 There are a set of keys required to run this repo. Place the keys in an .env file.
-ANTHROPIC_API_KEY - powers our chains
-PINECONE_API_KEY - for storing the documentation embeddings
-OPENAI_API_KEY - for creating embeddings
-GITHUB_ACCESS_TOKEN - for scraping open-source documentation structure.
+- `ANTHROPIC_API_KEY` - powers our chains
+- `PINECONE_API_KEY` - for storing the documentation embeddings
+- `OPENAI_API_KEY` - for creating embeddings
+- `GITHUB_ACCESS_TOKEN` - for scraping open-source repository documentation structure
 
 ### Step 1: Crawl the file structure of the github project. You need to set up the repo properties in src/utils
 
