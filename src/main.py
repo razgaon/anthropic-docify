@@ -6,7 +6,7 @@ from utils import LANGCHAIN_BASE, save_output, get_langchain_docs_url, get_all_p
 from tqdm import tqdm
 from vector_store import pinecone_vector_stores, get_index
 from llama_index.retrievers import VectorIndexRetriever
-
+import tiktoken
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-4s [%(filename)s:%(lineno)d] %(message)s",
@@ -19,9 +19,18 @@ SAVE_DIR = "langdocs/docs/"
 def get_args(reference_df):
     reference_doc = reference_df["content"].iloc[0]
     
+    encoding = tiktoken.get_encoding('cl100k_base')
+    num_tokens = len(encoding.encode(reference_doc))
+    retrievel_ref_doc = reference_doc
+    
+    if num_tokens > 8000:
+        print("Split large reference doc")
+        retrievel_ref_doc = reference_doc[:len(reference_doc)//2]
+    
     reference_page_name = (
         reference_df["url"].iloc[0].split(LANGCHAIN_BASE + "/")[1]
     )  # will return something like /modules/chains/how_to/memory.md'
+    
     # If the reference page name is empty, it will default to the index page
     if reference_page_name[-1] == "/":
         reference_page_name += "index"
@@ -29,7 +38,7 @@ def get_args(reference_df):
     index = get_index(pinecone_vector_stores["official"])
     retriever = VectorIndexRetriever(index=index, similarity_top_k=5)
     
-    similar_nodes_with_scores = retriever.retrieve(reference_doc)
+    similar_nodes_with_scores = retriever.retrieve(retrievel_ref_doc)
     similar_nodes = [n.node for n in similar_nodes_with_scores]
     text_from_nodes = [node.text for node in similar_nodes]
     
@@ -39,16 +48,15 @@ def get_args(reference_df):
 
 def main():
     skip_existing = True
-    directory = "/Users/allengu/langchain/docs/docs_skeleton/docs"  # replace with your directory path
+    directory = "/Users/razgaon/Desktop/langchain/docs/docs_skeleton/docs"  # replace with your directory path
 
     df = pd.read_csv("src/data/data.csv")
-    urls = get_langchain_docs_url(directory)
+    urls = get_all_paths(directory)
 
     errors = []
-    for url in tqdm(urls[30:50]):
+    for url in tqdm(urls):
         # Trigger deployment
         try:
-            print(url)
             reference_df = df[df["url"] == url]
             reference_doc, context, reference_page_name = get_args(reference_df)
             
